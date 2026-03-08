@@ -26,7 +26,7 @@ import ollama
 from retrieval import build_context
 from prompt import build_prompt, SYSTEM_PROMPT
 
-MODEL = "llama3.2"
+MODEL = "llama3.1:8b"
 
 # Words to strip when isolating team name fragments from the query.
 # "Duke vs Syracuse on Saturday night" -> ["duke", "syracuse"]

@@ -1,8 +1,8 @@
 DATA_DIR = data
 
-# Fetch fresh odds and stats before a session
+# Fetch fresh odds, stats, and injuries before a session
 fetch:
-	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py
+	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py
 
 # Fetch odds only
 odds:
@@ -11,6 +11,10 @@ odds:
 # Fetch stats only (requires odds to have run first)
 stats:
 	python3 $(DATA_DIR)/fetch_stats.py
+
+# Fetch injuries only (requires odds to have run first)
+injuries:
+	python3 $(DATA_DIR)/fetch_injuries.py
 
 # List today's games
 today:
@@ -29,4 +33,4 @@ reset:
 	rm -f db/sports.db
 	@echo "Database cleared."
 
-.PHONY: fetch odds stats today games query reset
+.PHONY: fetch odds stats injuries today games query reset

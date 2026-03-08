@@ -18,21 +18,23 @@ from datetime import datetime, timezone, timedelta
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "db/sports.db")
 
-# Bookmakers in priority order — Pinnacle first because it's the sharpest.
-BOOKMAKER_ORDER = ["pinnacle", "draftkings", "fanduel", "betmgm", "williamhill_us"]
+# Bookmakers in priority order for display.
+# We don't have Pinnacle on the free tier, so we compare across the three
+# recreational books instead. When one book disagrees with the other two,
+# that's a signal — it means one book is either slow to adjust or is seeing
+# different action than the others.
+BOOKMAKER_ORDER = ["draftkings", "fanduel", "betmgm"]
 BOOKMAKER_LABELS = {
-    "pinnacle": "Pinnacle     (sharp)",
-    "draftkings": "DraftKings   (recreational)",
-    "fanduel": "FanDuel      (recreational)",
-    "betmgm": "BetMGM       (recreational)",
-    "williamhill_us": "William Hill (recreational)",
+    "draftkings": "DraftKings ",
+    "fanduel": "FanDuel    ",
+    "betmgm": "BetMGM     ",
 }
 
 # Books to track for movement comparison
-MOVEMENT_BOOKS = ["pinnacle", "draftkings"]
+MOVEMENT_BOOKS = ["draftkings", "fanduel"]
 
 # Books to track for totals movement
-TOTALS_MOVEMENT_BOOKS = ["pinnacle", "draftkings"]
+TOTALS_MOVEMENT_BOOKS = ["draftkings", "fanduel"]
 
 
 # ── IMPLIED PROBABILITY ───────────────────────────────────────────────────────
@@ -125,35 +127,56 @@ def fetch_current_lines(conn, game_id):
     return lines, latest
 
 
-# ── SHARP VS. RECREATIONAL COMPARISON ─────────────────────────────────────────
-# This is new. We compare Pinnacle's spread to the recreational books and
-# flag meaningful disagreements. A half-point or more of disagreement between
-# Pinnacle and the rec books is a signal worth surfacing explicitly.
+# ── CROSS-BOOK SPREAD COMPARISON ──────────────────────────────────────────────
+# Without Pinnacle, we compare DraftKings, FanDuel, and BetMGM against each
+# other. When one book's spread disagrees with the other two by 0.5+ points,
+# it means that book is either slow to move or seeing different action.
+# The consensus of two books is more likely to be the "true" number.
 
 def analyze_line_disagreement(lines, home_team, away_team):
-    """Compare Pinnacle's spread to recreational books. Return analysis string."""
-    pinnacle = lines.get("pinnacle", {}).get("spreads", {}).get(home_team, {})
-    if not pinnacle or pinnacle.get("point") is None:
-        return "  Pinnacle spread not available — cannot compare sharp vs. recreational."
-
-    pin_spread = pinnacle["point"]
-    disagreements = []
-
-    for bk in ["draftkings", "fanduel", "betmgm"]:
+    """Compare spreads across available books. Flag outliers."""
+    spreads = {}
+    for bk in BOOKMAKER_ORDER:
         bk_data = lines.get(bk, {}).get("spreads", {}).get(home_team, {})
-        if not bk_data or bk_data.get("point") is None:
-            continue
-        diff = bk_data["point"] - pin_spread
+        if bk_data and bk_data.get("point") is not None:
+            spreads[bk] = bk_data["point"]
+
+    if len(spreads) < 2:
+        return "  Not enough books with spread data to compare."
+
+    home_short = home_team.split()[0]
+    books = list(spreads.keys())
+    points = list(spreads.values())
+
+    # Check if all books agree
+    if max(points) - min(points) < 0.5:
+        consensus = points[0]
+        return f"  All books agree within 0.5 pts ({home_short} {consensus:+.1f}). No cross-book divergence."
+
+    # Find the outlier — the book that disagrees with the others
+    disagreements = []
+    for i, bk in enumerate(books):
+        others = [p for j, p in enumerate(points) if j != i]
+        avg_others = sum(others) / len(others)
+        diff = spreads[bk] - avg_others
         if abs(diff) >= 0.5:
-            label = BOOKMAKER_LABELS[bk].split("(")[0].strip()
-            direction = "more favorable to the home team" if diff < 0 else "more favorable to the away team"
-            disagreements.append(f"  {label} has {home_team.split()[0]} at {bk_data['point']:+.1f} vs Pinnacle {pin_spread:+.1f} ({abs(diff):.1f} pts {direction})")
+            label = BOOKMAKER_LABELS[bk].strip()
+            other_labels = ", ".join(BOOKMAKER_LABELS[b].strip() for j, b in enumerate(books) if j != i)
+            if diff < 0:
+                direction = f"has the home team at a tighter spread than {other_labels}"
+            else:
+                direction = f"has the home team at a wider spread than {other_labels}"
+            disagreements.append(
+                f"  *** BOOK DISAGREEMENT: {label} has {home_short} {spreads[bk]:+.1f} "
+                f"while {other_labels} average {avg_others:+.1f} ({abs(diff):.1f} pt gap) ***\n"
+                f"  {label} {direction} — this may indicate different action or a slow line adjustment."
+            )
 
     if not disagreements:
-        return f"  All books agree within 0.5 pts. Pinnacle has {home_team.split()[0]} {pin_spread:+.1f}. No sharp/public divergence."
-    else:
-        header = f"  *** SHARP vs RECREATIONAL DISAGREEMENT DETECTED ***\n  Pinnacle (sharp) has {home_team.split()[0]} {pin_spread:+.1f}."
-        return header + "\n" + "\n".join(disagreements)
+        spread_str = ", ".join(f"{BOOKMAKER_LABELS[b].strip()} {s:+.1f}" for b, s in spreads.items())
+        return f"  Minor spread differences across books: {spread_str}. No significant outlier."
+
+    return "\n".join(disagreements)
 
 
 # ── FETCH LINE MOVEMENT (MULTI-BOOK) ──────────────────────────────────────────
@@ -236,6 +259,40 @@ def fetch_team_stats(conn, team_name):
     }
 
     return summary, games
+
+
+# ── FETCH INJURIES ────────────────────────────────────────────────────────────
+# Pull current injuries from the database for a team.
+
+def fetch_injuries(conn, team_name):
+    cursor = conn.execute("""
+        SELECT player_name, position, status, detail
+        FROM injuries
+        WHERE team_name = ?
+        ORDER BY status ASC
+    """, (team_name,))
+    return cursor.fetchall()
+
+
+# ── FORMAT INJURIES BLOCK ─────────────────────────────────────────────────────
+
+def format_injuries(injuries, team_name):
+    if not injuries:
+        return "  No injuries reported."
+
+    lines = []
+    for player, position, status, detail in injuries:
+        pos_str = f" ({position})" if position else ""
+        detail_str = f" — {detail}" if detail else ""
+        # Flag key statuses for the model
+        if status and status.lower() in ("out", "out for season"):
+            lines.append(f"  *** OUT: {player}{pos_str}{detail_str} ***")
+        elif status and status.lower() in ("doubtful", "questionable"):
+            lines.append(f"  {status.upper()}: {player}{pos_str}{detail_str}")
+        else:
+            lines.append(f"  {status}: {player}{pos_str}{detail_str}")
+
+    return "\n".join(lines)
 
 
 # ── HOME/AWAY SPLITS ──────────────────────────────────────────────────────────
@@ -366,38 +423,57 @@ def fetch_totals_movement(conn, game_id):
     return all_movements
 
 
-# ── TOTALS SHARP vs RECREATIONAL COMPARISON ───────────────────────────────────
-# Same logic as spread disagreement but for the O/U number.
+# ── CROSS-BOOK TOTALS COMPARISON ──────────────────────────────────────────────
+# Same approach as spreads — compare the three books against each other.
+# A 1+ point disagreement on the total is meaningful.
 
 def analyze_totals_disagreement(lines):
-    """Compare Pinnacle's total to recreational books."""
-    pin_over = lines.get("pinnacle", {}).get("totals", {}).get("Over", {})
-    if not pin_over or pin_over.get("point") is None:
-        return "  Pinnacle total not available — cannot compare sharp vs. recreational."
-
-    pin_total = pin_over["point"]
-    disagreements = []
-
-    for bk in ["draftkings", "fanduel", "betmgm"]:
+    """Compare totals across available books. Flag outliers."""
+    totals = {}
+    for bk in BOOKMAKER_ORDER:
         bk_over = lines.get(bk, {}).get("totals", {}).get("Over", {})
-        if not bk_over or bk_over.get("point") is None:
-            continue
-        diff = bk_over["point"] - pin_total
+        if bk_over and bk_over.get("point") is not None:
+            totals[bk] = bk_over["point"]
+
+    if len(totals) < 2:
+        return "  Not enough books with totals data to compare."
+
+    books = list(totals.keys())
+    points = list(totals.values())
+
+    if max(points) - min(points) < 1.0:
+        consensus = sum(points) / len(points)
+        return f"  All books agree on the total within 1 point (consensus ~{consensus:.1f}). No cross-book divergence."
+
+    disagreements = []
+    for i, bk in enumerate(books):
+        others = [p for j, p in enumerate(points) if j != i]
+        avg_others = sum(others) / len(others)
+        diff = totals[bk] - avg_others
         if abs(diff) >= 1.0:
-            label = BOOKMAKER_LABELS[bk].split("(")[0].strip()
+            label = BOOKMAKER_LABELS[bk].strip()
+            other_labels = ", ".join(BOOKMAKER_LABELS[b].strip() for j, b in enumerate(books) if j != i)
             direction = "higher" if diff > 0 else "lower"
-            disagreements.append(f"  {label} has O/U {bk_over['point']:.1f} vs Pinnacle {pin_total:.1f} ({abs(diff):.1f} pts {direction})")
+            disagreements.append(
+                f"  *** TOTALS DISAGREEMENT: {label} has O/U {totals[bk]:.1f} "
+                f"while {other_labels} average {avg_others:.1f} ({abs(diff):.1f} pts {direction}) ***"
+            )
 
     if not disagreements:
-        return f"  All books agree on the total within 1 point. Pinnacle has O/U {pin_total:.1f}. No sharp/public divergence on totals."
-    else:
-        header = f"  *** SHARP vs RECREATIONAL TOTALS DISAGREEMENT ***\n  Pinnacle (sharp) has O/U {pin_total:.1f}."
-        return header + "\n" + "\n".join(disagreements)
+        totals_str = ", ".join(f"{BOOKMAKER_LABELS[b].strip()} {t:.1f}" for b, t in totals.items())
+        return f"  Minor totals differences across books: {totals_str}. No significant outlier."
+
+    return "\n".join(disagreements)
 
 
 # ── TOTALS ANALYSIS (pre-computed) ────────────────────────────────────────────
 # Compare the posted O/U line against our expected total derived from team stats.
 # Flag the gap and interpret it so the model doesn't have to.
+#
+# IMPORTANT: This estimate uses raw season averages, which tend to run HIGH
+# because they include blowouts against weak teams. The books use pace-adjusted
+# efficiency and strength of schedule — they're smarter than a simple average.
+# We need wide thresholds to avoid systematically biasing toward OVER.
 
 def totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_movements):
     """Pre-compute totals edge analysis."""
@@ -406,10 +482,10 @@ def totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_
 
     result_lines = []
 
-    # Get the consensus total (prefer Pinnacle, fall back to DraftKings)
+    # Get the consensus total from available books
     posted_total = None
     source_book = None
-    for bk in ["pinnacle", "draftkings", "fanduel", "betmgm"]:
+    for bk in ["draftkings", "fanduel", "betmgm"]:
         over = lines.get(bk, {}).get("totals", {}).get("Over", {})
         if over and over.get("point") is not None:
             posted_total = over["point"]
@@ -429,22 +505,30 @@ def totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_
     home_short = home_team.split()[0]
     away_short = away_team.split()[0]
 
-    result_lines.append(f"  Posted O/U: {posted_total} (from {BOOKMAKER_LABELS.get(source_book, source_book).split('(')[0].strip()})")
+    result_lines.append(f"  Posted O/U: {posted_total} (from {BOOKMAKER_LABELS.get(source_book, source_book).strip()})")
     result_lines.append(f"  Expected {home_short} output: ({home_stats['ppg']:.1f} ppg + {away_stats['papg']:.1f} papg) / 2 = {home_expected:.1f}")
     result_lines.append(f"  Expected {away_short} output: ({away_stats['ppg']:.1f} ppg + {home_stats['papg']:.1f} papg) / 2 = {away_expected:.1f}")
     result_lines.append(f"  Expected total: {expected_total}")
     result_lines.append(f"  Gap vs posted line: {gap:+.1f} points")
+    result_lines.append(f"  NOTE: This estimate uses raw season averages which tend to run HIGH (blowouts")
+    result_lines.append(f"  inflate offensive numbers). The books use more sophisticated models. A gap under")
+    result_lines.append(f"  5 points should NOT be treated as a signal on its own — it needs confirmation")
+    result_lines.append(f"  from line movement or cross-book disagreement to be actionable.")
 
-    if gap > 3:
-        result_lines.append(f"  *** OVER SIGNAL: Expected total is {gap:.1f} points ABOVE the posted line. Stats suggest this game should score higher than the market expects. ***")
+    # Thresholds raised to avoid systematic OVER bias:
+    #   5+ points  = genuine signal worth flagging
+    #   3-5 points = slight lean, needs confirmation
+    #   under 3    = noise, market is probably right
+    if gap > 5:
+        result_lines.append(f"  *** OVER SIGNAL: Expected total is {gap:.1f} points ABOVE the posted line. This is a large gap that may indicate a genuine over. ***")
+    elif gap < -5:
+        result_lines.append(f"  *** UNDER SIGNAL: Expected total is {abs(gap):.1f} points BELOW the posted line. This is a large gap that may indicate a genuine under. ***")
+    elif gap > 3:
+        result_lines.append(f"  Slight lean OVER: expected total is {gap:.1f} above the line. This alone is NOT enough to bet — needs confirming signals (line movement or book disagreement).")
     elif gap < -3:
-        result_lines.append(f"  *** UNDER SIGNAL: Expected total is {abs(gap):.1f} points BELOW the posted line. Stats suggest this game should score lower than the market expects. ***")
-    elif gap > 1.5:
-        result_lines.append(f"  Slight lean OVER: expected total is {gap:.1f} above the line, but not a strong signal on its own.")
-    elif gap < -1.5:
-        result_lines.append(f"  Slight lean UNDER: expected total is {abs(gap):.1f} below the line, but not a strong signal on its own.")
+        result_lines.append(f"  Slight lean UNDER: expected total is {abs(gap):.1f} below the line. This alone is NOT enough to bet — needs confirming signals (line movement or book disagreement).")
     else:
-        result_lines.append(f"  Total is well-priced. Gap of {gap:+.1f} suggests the market has this right.")
+        result_lines.append(f"  Total is well-priced. Gap of {gap:+.1f} is within noise range. No edge from stats alone.")
 
     # Recent scoring trends — last 5 games combined
     home_last5_ppg = None
@@ -459,7 +543,7 @@ def totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_
         result_lines.append("")
         result_lines.append("  Totals line movement:")
         for book, m in totals_movements.items():
-            label = BOOKMAKER_LABELS.get(book, book).split("(")[0].strip()
+            label = BOOKMAKER_LABELS.get(book, book).strip()
             if m["movement"] > 0:
                 result_lines.append(f"    {label}: opened {m['open']:.1f} -> now {m['current']:.1f} (moved UP {m['movement']:.1f} — market is adjusting toward OVER)")
             elif m["movement"] < 0:
@@ -473,7 +557,7 @@ def totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_
             m1 = totals_movements[books[0]]["movement"]
             m2 = totals_movements[books[1]]["movement"]
             if m1 != 0 and m2 != 0 and (m1 > 0) != (m2 > 0):
-                result_lines.append("    *** DIVERGENT TOTALS MOVEMENT: Sharp and recreational books moved the total in opposite directions. ***")
+                result_lines.append("    *** DIVERGENT TOTALS MOVEMENT: Books moved the total in opposite directions. ***")
 
     return "\n".join(result_lines)
 
@@ -677,6 +761,10 @@ def build_context(team1_query, team2_query):
     home_stats, home_games = fetch_team_stats(conn, home_team)
     away_stats, away_games = fetch_team_stats(conn, away_team)
 
+    # Fetch injuries
+    home_injuries = fetch_injuries(conn, home_team)
+    away_injuries = fetch_injuries(conn, away_team)
+
     # Pre-compute rest days
     home_rest = days_of_rest(home_games, game_date_str) if game_date_str else None
     away_rest = days_of_rest(away_games, game_date_str) if game_date_str else None
@@ -695,6 +783,10 @@ def build_context(team1_query, team2_query):
     # Totals edge analysis
     totals_edge = totals_analysis(lines, home_stats, away_stats, home_team, away_team, totals_movements)
 
+    # Format injuries
+    home_injuries_str = format_injuries(home_injuries, home_team)
+    away_injuries_str = format_injuries(away_injuries, away_team)
+
     # Assemble context block
     context = f"""MATCHUP: {away_team} @ {home_team}
 GAME TIME: {tip_str}
@@ -706,12 +798,12 @@ CURRENT LINES (implied probabilities pre-calculated from American odds)
 {format_lines(lines, home_team, away_team)}
 
 ══════════════════════════════════════════════════════════════════════
-SHARP vs RECREATIONAL LINE COMPARISON (SPREADS)
+CROSS-BOOK SPREAD COMPARISON
 ══════════════════════════════════════════════════════════════════════
 {disagreement}
 
 ══════════════════════════════════════════════════════════════════════
-SHARP vs RECREATIONAL LINE COMPARISON (TOTALS)
+CROSS-BOOK TOTALS COMPARISON
 ══════════════════════════════════════════════════════════════════════
 {totals_disagree}
 
@@ -729,6 +821,16 @@ SCORING MATCHUP ANALYSIS (pre-computed)
 TOTALS ANALYSIS (pre-computed — expected total vs posted O/U)
 ══════════════════════════════════════════════════════════════════════
 {totals_edge}
+
+══════════════════════════════════════════════════════════════════════
+INJURIES — {home_team.upper()} (HOME)
+══════════════════════════════════════════════════════════════════════
+{home_injuries_str}
+
+══════════════════════════════════════════════════════════════════════
+INJURIES — {away_team.upper()} (AWAY)
+══════════════════════════════════════════════════════════════════════
+{away_injuries_str}
 
 ══════════════════════════════════════════════════════════════════════
 {home_team.upper()} (HOME)
