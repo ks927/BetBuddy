@@ -1,0 +1,4 @@
+echo "db/sports.db
+.env
+__pycache__/
+*.pyc" > .gitignore
