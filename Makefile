@@ -28,6 +28,22 @@ games:
 query:
 	python3 query.py "$(Q)"
 
+# Grade predictions against actual results
+score:
+	python3 -m data.fetch_scores && python3 score_predictions.py
+
+# View your record
+record:
+	python3 record.py
+
+# View full record with all picks
+record-detail:
+	python3 record.py --detail
+
+# Manual pick entry (if auto-parse fails)
+log:
+	python3 prediction_logger.py
+
 # Wipe the database and start fresh
 reset:
 	rm -f db/sports.db
