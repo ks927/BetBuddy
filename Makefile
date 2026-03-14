@@ -1,8 +1,14 @@
 DATA_DIR = data
 
+# Load .env file if it exists
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 # Fetch fresh odds, stats, and injuries before a session
 fetch:
-	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py
+	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py && python3 -m data.fetch_ats && make publish
 
 # Fetch odds only
 odds:
@@ -40,9 +46,40 @@ record:
 record-detail:
 	python3 record.py --detail
 
+# View ungraded (pending) predictions
+pending:
+	@echo ""
+	@echo "── Pending Predictions ──"
+	@echo ""
+	@sqlite3 -header -column db/sports.db \
+		"SELECT game_date AS date, away_team AS away, home_team AS home, market, pick, confidence AS conf FROM predictions WHERE result IS NULL ORDER BY game_date"
+	@echo ""
+
+# Remove a pending prediction by ID
+unpick:
+	@sqlite3 -header -column db/sports.db \
+		"SELECT id, game_date AS date, away_team AS away, home_team AS home, market, pick, confidence AS conf FROM predictions WHERE result IS NULL ORDER BY game_date"
+	@echo ""
+	@read -p "Enter ID to delete (or 'n' to cancel): " id; \
+	if [ "$$id" != "n" ]; then \
+		sqlite3 db/sports.db "DELETE FROM predictions WHERE id = $$id AND result IS NULL"; \
+		echo "✓ Deleted prediction $$id"; \
+	else \
+		echo "Cancelled."; \
+	fi
+
+ats:
+	python3 -m data.fetch_ats
+
 # Manual pick entry (if auto-parse fails)
 log:
 	python3 prediction_logger.py
+
+publish:
+	python3 publish.py --push
+
+publish-preview:
+	python3 publish.py
 
 # Wipe the database and start fresh
 reset:

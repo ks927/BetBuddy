@@ -1,4 +1,4 @@
-BetBuddy
+# BetBuddy
 A local-first NCAAB (college basketball) betting analysis system. It pulls live odds, team stats, and injury reports, stores everything in a local database, and uses an LLM running on your machine to produce structured betting analysis — identifying when the spread or total is mispriced.
 BetBuddy evaluates both the spread and the over/under for every game and recommends whichever market has the stronger edge. If neither market has an edge, it says so and explains why.
 Every pick can be logged and tracked against actual results, giving you a running record with ROI and confidence breakdowns.
