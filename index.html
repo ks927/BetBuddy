@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
- 
+
         :root {
             --bg: #09090b;
             --bg-card: #111113;
@@ -30,7 +30,7 @@
             --chip-border: #27272a;
             --pending-opacity: 0.55;
         }
- 
+
         body.light {
             --bg: #fafafa;
             --bg-card: #ffffff;
@@ -52,7 +52,7 @@
             --chip-border: #e4e4e7;
             --pending-opacity: 0.45;
         }
- 
+
         body {
             font-family: 'DM Sans', sans-serif;
             background: var(--bg);
@@ -60,13 +60,13 @@
             min-height: 100vh;
             transition: background 0.2s, color 0.2s;
         }
- 
+
         .header {
             background: var(--bg-header);
             border-bottom: 1px solid var(--border);
             padding: 28px 24px 20px;
         }
- 
+
         .header-inner {
             max-width: 720px;
             margin: 0 auto;
@@ -74,7 +74,7 @@
             justify-content: space-between;
             align-items: baseline;
         }
- 
+
         .header h1 {
             font-family: 'JetBrains Mono', monospace;
             font-size: 22px;
@@ -82,16 +82,16 @@
             color: var(--text-heading);
             letter-spacing: -0.5px;
         }
- 
+
         .header h1 span {
             color: var(--accent);
         }
- 
+
         .header .date {
             font-size: 13px;
             color: var(--text-dim);
         }
- 
+
         .subheader {
             max-width: 720px;
             margin: 0 auto;
@@ -100,31 +100,31 @@
             justify-content: space-between;
             align-items: center;
         }
- 
+
         .game-count {
             font-size: 13px;
             color: var(--text-muted);
         }
- 
+
         .legend {
             display: flex;
             gap: 16px;
             font-size: 12px;
             color: var(--text-dim);
         }
- 
+
         .legend-item {
             display: flex;
             align-items: center;
             gap: 6px;
         }
- 
+
         .container {
             max-width: 720px;
             margin: 0 auto;
             padding: 8px 16px 48px;
         }
- 
+
         .game-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -133,19 +133,19 @@
             overflow: hidden;
             transition: border-color 0.15s, background 0.2s;
         }
- 
+
         .game-card.analyzed {
             cursor: pointer;
         }
- 
+
         .game-card.analyzed:hover {
             border-color: var(--border-hover);
         }
- 
+
         .game-card.pending {
             opacity: var(--pending-opacity);
         }
- 
+
         .game-header {
             display: flex;
             justify-content: space-between;
@@ -153,7 +153,7 @@
             padding: 14px 16px;
             gap: 12px;
         }
- 
+
         .matchup {
             display: flex;
             align-items: center;
@@ -161,69 +161,69 @@
             flex-wrap: wrap;
             min-width: 0;
         }
- 
+
         .status-dot {
             width: 7px;
             height: 7px;
             border-radius: 50%;
             flex-shrink: 0;
         }
- 
+
         .status-dot.analyzed {
             background: var(--accent);
         }
- 
+
         .status-dot.pending {
             background: var(--dot-pending);
         }
- 
+
         .team {
             font-weight: 600;
             font-size: 14px;
             color: var(--text-team);
         }
- 
+
         .at {
             color: var(--text-faint);
             font-size: 12px;
         }
- 
+
         .game-meta {
             display: flex;
             align-items: center;
             gap: 14px;
             flex-shrink: 0;
         }
- 
+
         .odds-line {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             color: var(--text-dim);
         }
- 
+
         .tip-time {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             color: var(--text-faint);
         }
- 
+
         .expand-icon {
             color: var(--text-faint);
             font-size: 13px;
             transition: transform 0.15s;
         }
- 
+
         .expand-icon.open {
             transform: rotate(90deg);
         }
- 
+
         .picks-row {
             display: flex;
             gap: 6px;
             padding: 0 16px 12px;
             flex-wrap: wrap;
         }
- 
+
         .pick-chip {
             display: flex;
             align-items: center;
@@ -233,36 +233,36 @@
             border-radius: 6px;
             padding: 6px 12px;
         }
- 
+
         .pick-chip.pass {
             opacity: 0.5;
         }
- 
+
         .pick-label {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             font-weight: 700;
             color: var(--text-heading);
         }
- 
+
         .pick-conf {
             font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
- 
+
         .analysis-panel {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
         }
- 
+
         .analysis-panel.open {
             max-height: 3000px;
             transition: max-height 0.5s ease-in;
         }
- 
+
         .analysis-content {
             padding: 0 16px 16px;
             font-size: 13px;
@@ -271,11 +271,11 @@
             padding-top: 14px;
             line-height: 1.65;
         }
- 
+
         .analysis-content strong {
             color: var(--text-analysis-strong);
         }
- 
+
         .footer {
             text-align: center;
             padding: 24px;
@@ -283,7 +283,7 @@
             color: var(--text-footer);
             font-family: 'JetBrains Mono', monospace;
         }
- 
+
         .theme-toggle {
             position: fixed;
             bottom: 20px;
@@ -302,11 +302,11 @@
             transition: background 0.2s, border-color 0.2s;
             z-index: 100;
         }
- 
+
         .theme-toggle:hover {
             border-color: var(--border-hover);
         }
- 
+
         @media (max-width: 480px) {
             .header-inner { flex-direction: column; gap: 4px; }
             .game-header { flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -319,12 +319,12 @@
     <div class="header">
         <div class="header-inner">
             <h1>Bet<span>Buddy</span></h1>
-            <span class="date">Saturday, March 14, 2026</span>
+            <span class="date">Sunday, March 15, 2026</span>
         </div>
     </div>
- 
+
     <div class="subheader">
-        <span class="game-count">20 games · 4 analyzed</span>
+        <span class="game-count">3 games · 3 analyzed</span>
         <div class="legend">
             <div class="legend-item">
                 <span class="status-dot analyzed"></span>
@@ -336,463 +336,166 @@
             </div>
         </div>
     </div>
- 
+
     <div class="container">
         
-        <div class="game-card pending" >
+        <div class="game-card analyzed" onclick="toggleAnalysis('game-0')">
             <div class="game-header">
                 <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Cornell Big Red</span>
+                    <span class="status-dot analyzed"></span>
+                    <span class="team away">Cal Baptist Lancers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Utah Valley Wolverines</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Utah -3.5 · O/U 139.5</span>
+                    <span class="tip-time">12:00 AM ET</span>
+                    <span class="expand-icon" id="icon-game-0">▸</span>
+                </div>
+            </div>
+            <div class="picks-row">
+                    <div class="pick-chip">
+                        <span class="pick-label">Utah Valley -3.5</span>
+                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
+                    </div>
+                    <div class="pick-chip">
+                        <span class="pick-label">OVER 139.5</span>
+                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
+                    </div></div>
+            
+                <div class="analysis-panel" id="game-0">
+                    <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
+The current spread, total, and moneyline from each book are:
+- DraftKings: Utah -3.5, O/U 139.5, ML Utah -162
+- FanDuel: Utah -3.5, O/U 138.5, ML Utah -160
+- BetMGM: Utah -3.5, O/U 139.5, ML Utah -160</p>
+<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
+Cross-book totals comparison: <strong>* TOTALS DISAGREEMENT: FanDuel has O/U 138.5 while DraftKings, BetMGM average 139.5 (1.0 pts lower) </strong>*</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
+For the spread, both DraftKings and FanDuel have seen movement towards the favorite, Utah Valley. DraftKings opened Utah at -1.5 and it has moved to -3.5, while FanDuel opened Utah at -2.5 and it is now -3.5. This indicates market consensus is growing in confidence for Utah Valley to cover the spread.
+For the total, both DraftKings and FanDuel have seen the line move up by 1.0 point, from 138.5 to 139.5 and 137.5 to 138.5 respectively. This movement signals that the market is adjusting towards the OVER.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
+The weight of evidence strongly favors Utah Valley covering the spread of -3.5. Utah Valley boasts an exceptional ATS record, covering 72.7% overall this season and an even more impressive 73.9% when playing as the favorite. This indicates the market consistently undervalues them. In contrast, Cal Baptist is a poor cover team, only covering 41.9% of the time overall. While Cal Baptist has a better recent form margin (+17.4 vs Utah&#x27;s +4.6 over the last 5 games), Utah Valley still holds a superior season margin of +12.2 compared to Cal Baptist&#x27;s +5.6. Furthermore, the line movement across books has shifted towards Utah Valley, increasing their favored spread from -1.5/-2.5 to -3.5, reinforcing market confidence in them. The neutral site and equal rest days mean these factors do not provide an advantage to either side.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
+There is a clear edge on the OVER for this game. Our pre-computed expected total of 145.2 points is 5.7 points above the current DraftKings line of 139.5. This gap significantly exceeds the 5-point threshold, indicating a meaningful OVER signal from the raw statistics. This strong statistical lean is further confirmed by the line movement, as both DraftKings and FanDuel have adjusted their totals upwards by 1.0 point, signaling market agreement with an OVER trend. While there is a slight cross-book disagreement with FanDuel at 138.5, the overall trend and the substantial gap from the expected total point firmly to the OVER.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>5. SITUATIONAL FACTORS</strong>
+No injuries are reported for either Utah Valley or Cal Baptist. Both teams are on back-to-back rest days (1 day of rest), meaning fatigue is an equal factor for both sides and does not provide a specific advantage. The game is being played at a neutral site, so home-court advantage is not a factor.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>6. CONCLUSION</strong>
+SPREAD VERDICT: Utah Valley -3.5 at HIGH
+TOTALS VERDICT: OVER 139.5 at HIGH</p>
+<p style='margin:0 0 12px;line-height:1.6'>RECOMMENDATION 1: Utah Valley -3.5 — HIGH
+Utah Valley covers an impressive 73.9% of the time as a favorite, indicating consistent market undervaluation, while Cal Baptist covers only 41.9% overall. Utah also holds a superior season margin of +12.2 compared to Cal Baptist&#x27;s +5.6, and the market has moved the line from -1.5/-2.5 to -3.5 in Utah&#x27;s favor.
+RECOMMENDATION 2: OVER 139.5 — HIGH
+The pre-computed expected total of 145.2 is 5.7 points above the current line of 139.5, which is a significant OVER signal. This strong statistical lean is confirmed by line movement across books, with the total adjusting up by 1.0 point.</p></div>
+                </div>
+        </div>
+        <div class="game-card analyzed" onclick="toggleAnalysis('game-1')">
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot analyzed"></span>
+                    <span class="team away">Pennsylvania Quakers</span>
                     <span class="at">@</span>
                     <span class="team home">Yale Bulldogs</span>
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Yale -4.5 · O/U 163.5</span>
-                    <span class="tip-time">11:00 AM ET</span>
-                    
+                    <span class="odds-line">Yale -9.5 · O/U 142.5</span>
+                    <span class="tip-time">12:00 PM ET</span>
+                    <span class="expand-icon" id="icon-game-1">▸</span>
                 </div>
             </div>
+            <div class="picks-row">
+                    <div class="pick-chip">
+                        <span class="pick-label">Yale -9.5</span>
+                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
+                    </div>
+                    <div class="pick-chip">
+                        <span class="pick-label">OVER 142.5</span>
+                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
+                    </div></div>
             
-            
+                <div class="analysis-panel" id="game-1">
+                    <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
+The current spread, total, and moneyline from each book are:
+- DraftKings: Yale -9.5, O/U 142.5, ML Yale -485
+- FanDuel: Yale -9.5, O/U 142.5, ML Yale -450
+- BetMGM: Yale -9.5, O/U 142.5, ML Yale -500</p>
+<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
+Cross-book totals comparison: Books are in agreement — no significant divergence.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
+The current spread, total, and moneyline from each book are:
+- DraftKings: Yale -9.5, O/U 142.5, ML Yale -485
+- FanDuel: Yale -9.5, O/U 142.5, ML Yale -450
+- BetMGM: Yale -9.5, O/U 142.5, ML Yale -500</p>
+<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
+Cross-book totals comparison: Books are in agreement — no significant divergence.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
+The spread for Yale -9.5 and Pennsylvania +9.5 has shown no movement across DraftKings and FanDuel. Similarly, the total of 142.5 has remained unchanged on both books. This indicates strong market confidence in the initial numbers for both the spread and the total.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
+The data strongly favors Yale -9.5. Yale boasts a significantly better season margin of +11.3 compared to Pennsylvania&#x27;s +2.8, a difference of 8.5 points. Their recent form also shows Yale with a +8.8 margin over their last 5 games, outperforming Pennsylvania&#x27;s +6.2. Crucially, Yale has an excellent ATS record, covering 63.0% of the time overall and an impressive 59.1% as a favorite, suggesting the market consistently undervalues them. The scoring matchup analysis further supports Yale, with their offense (81.7 ppg) creating an +8.8 mismatch against Pennsylvania&#x27;s defense (72.9 papg). Both teams are on back-to-back rest, neutralizing any fatigue advantage. The weight of evidence points to Yale covering the -9.5 spread.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
+The data indicates a meaningful lean towards the OVER 142.5. Our expected total is 150.4, which is 7.9 points above the posted line of 142.5. This gap exceeds the 5-point threshold, signaling a genuine OVER. The combined scoring pace of both teams is 157.4 ppg, which is also well above the posted total. While there has been no line movement on the total, suggesting market confidence in the current number, the significant statistical discrepancy between the expected total and the posted line provides a clear signal for the OVER.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>5. SITUATIONAL FACTORS</strong>
+No injuries have been reported for either Yale or Pennsylvania. Both teams are playing on back-to-back rest, meaning fatigue is a neutral factor affecting both sides equally. As this is a neutral site game, there is no home-court advantage to consider.</p>
+<p style='margin:0 0 12px;line-height:1.6'><strong>6. CONCLUSION</strong>
+SPREAD VERDICT: Yale -9.5 at HIGH
+TOTALS VERDICT: OVER 142.5 at MEDIUM</p>
+<p style='margin:0 0 12px;line-height:1.6'>RECOMMENDATION 1: Yale -9.5 — HIGH
+Yale presents a strong case to cover, backed by a 59.1% ATS record as a favorite and a season margin of +11.3, significantly better than Pennsylvania&#x27;s +2.8. Their offense also creates an +8.8 mismatch against Pennsylvania&#x27;s defense.
+RECOMMENDATION 2: OVER 142.5 — MEDIUM
+The expected total of 150.4 is 7.9 points above the posted line of 142.5, exceeding the 5-point threshold for a meaningful OVER signal. This statistical edge, combined with a high combined scoring pace, points to a higher-scoring game.</p></div>
+                </div>
         </div>
-        <div class="game-card pending" >
+        <div class="game-card analyzed" onclick="toggleAnalysis('game-2')">
             <div class="game-header">
                 <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Vermont Catamounts</span>
-                    <span class="at">@</span>
-                    <span class="team home">UMBC Retrievers</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">UMBC -2.5 · O/U 136.5</span>
-                    <span class="tip-time">11:00 AM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Dayton Flyers</span>
-                    <span class="at">@</span>
-                    <span class="team home">Saint Louis Billikens</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Saint -5.5 · O/U 148.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Vanderbilt Commodores</span>
-                    <span class="at">@</span>
-                    <span class="team home">Florida Gators</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Florida -8.5 · O/U 160.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">North Carolina Central Eagles</span>
-                    <span class="at">@</span>
-                    <span class="team home">Howard Bison</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Howard -12.5 · O/U 144.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Wisconsin Badgers</span>
+                    <span class="status-dot analyzed"></span>
+                    <span class="team away">Purdue Boilermakers</span>
                     <span class="at">@</span>
                     <span class="team home">Michigan Wolverines</span>
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Michigan -12.5 · O/U 160.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Pennsylvania Quakers</span>
-                    <span class="at">@</span>
-                    <span class="team home">Harvard Crimson</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Harvard -2.5 · O/U 136.5</span>
-                    <span class="tip-time">2:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Charlotte 49ers</span>
-                    <span class="at">@</span>
-                    <span class="team home">South Florida Bulls</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">South -14.5 · O/U 153.5</span>
-                    <span class="tip-time">3:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Ole Miss Rebels</span>
-                    <span class="at">@</span>
-                    <span class="team home">Arkansas Razorbacks</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Arkansas -3.5 · O/U 182.5</span>
+                    <span class="odds-line">Michigan -6.5 · O/U 153.5</span>
                     <span class="tip-time">3:30 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Purdue Boilermakers</span>
-                    <span class="at">@</span>
-                    <span class="team home">UCLA Bruins</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">UCLA +7.5 · O/U 147.5</span>
-                    <span class="tip-time">3:30 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Saint Joseph&#x27;s Hawks</span>
-                    <span class="at">@</span>
-                    <span class="team home">VCU Rams</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">VCU -18.5 · O/U 142.5</span>
-                    <span class="tip-time">3:30 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Tulsa Golden Hurricane</span>
-                    <span class="at">@</span>
-                    <span class="team home">Wichita St Shockers</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Wichita -1.5 · O/U 153.5</span>
-                    <span class="tip-time">5:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Houston Cougars</span>
-                    <span class="at">@</span>
-                    <span class="team home">Arizona Wildcats</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Arizona -1.5 · O/U 138.5</span>
-                    <span class="tip-time">6:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">San Diego St Aztecs</span>
-                    <span class="at">@</span>
-                    <span class="team home">Utah State Aggies</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Utah -2.5 · O/U 145.5</span>
-                    <span class="tip-time">6:00 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">UConn Huskies</span>
-                    <span class="at">@</span>
-                    <span class="team home">St. John&#x27;s Red Storm</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">St. +2.5 · O/U 138.5</span>
-                    <span class="tip-time">6:30 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card pending" >
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot pending"></span>
-                    <span class="team away">Prairie View Panthers</span>
-                    <span class="at">@</span>
-                    <span class="team home">Southern Jaguars</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Southern -2.5 · O/U 145.5</span>
-                    <span class="tip-time">7:30 PM ET</span>
-                    
-                </div>
-            </div>
-            
-            
-        </div>
-        <div class="game-card analyzed" onclick="toggleAnalysis('game-16')">
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot analyzed"></span>
-                    <span class="team away">Toledo Rockets</span>
-                    <span class="at">@</span>
-                    <span class="team home">Akron Zips</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Akron -8.5 · O/U 157.5</span>
-                    <span class="tip-time">8:00 PM ET</span>
-                    <span class="expand-icon" id="icon-game-16">▸</span>
-                </div>
-            </div>
-            
-            
-                <div class="analysis-panel" id="game-16">
-                    <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
-The current spread, total, and moneyline from each book are:
-- DraftKings: Akron -8.5, O/U 157.5, ML Akron -395
-- FanDuel: Akron -8.5, O/U 158.5, ML Akron -360
-- BetMGM: Akron -8.5, O/U 157.5, ML Akron -400</p>
-<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
-Cross-book totals comparison: <strong>* TOTALS DISAGREEMENT: FanDuel has O/U 158.5 while DraftKings, BetMGM average 157.5 (1.0 pts higher) </strong>*</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
-For the spread, both DraftKings and FanDuel moved the line from Akron -7.5 to Akron -8.5. This indicates a market consensus shifting towards the favorite, Akron, suggesting increased confidence in them covering the current spread. For the total, both DraftKings and FanDuel moved the line down. DraftKings adjusted from 159.5 to 157.5 (a 2.0-point decrease), and FanDuel moved from 159.5 to 158.5 (a 1.0-point decrease). This consistent downward movement across books signals that the market is adjusting towards the UNDER.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
-The SPREAD DIRECTION SUMMARY indicates Akron has a significant statistical advantage, with a 10.5-point better season margin (+15.2 vs +4.7) and a stronger recent form with an 8.4-point better margin over their last 5 games (+16.8 vs +8.4). Akron&#x27;s offense also presents a +12.1 mismatch against Toledo&#x27;s defense. However, the ATS records provide a strong counter-narrative. The KEY FACTS state that Akron is a &quot;POOR cover team&quot; overall, covering only 43.3% of the time, indicating the market consistently overvalues them. Conversely, Toledo is a &quot;GOOD cover team,&quot; covering 63.6% of the time, suggesting the market consistently undervalues them. While the line movement has shifted towards Akron -8.5, the long-term market mispricing highlighted by the ATS records and KEY FACTS is a more compelling signal for identifying value. The weight of evidence, particularly the consistent market overvaluation of Akron and undervaluation of Toledo, favors Toledo +8.5.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
-The TOTALS DIRECTION SUMMARY indicates that our expected total of 159.9 is only 2.4 points above the posted line of 157.5. This gap is explicitly stated to be &quot;BELOW the 3-point threshold,&quot; meaning there is &quot;No meaningful edge&quot; from</p></div>
-                </div>
-        </div>
-        <div class="game-card analyzed" onclick="toggleAnalysis('game-17')">
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot analyzed"></span>
-                    <span class="team away">Kennesaw St Owls</span>
-                    <span class="at">@</span>
-                    <span class="team home">Louisiana Tech Bulldogs</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Louisiana +1.5 · O/U 142.5</span>
-                    <span class="tip-time">8:30 PM ET</span>
-                    <span class="expand-icon" id="icon-game-17">▸</span>
+                    <span class="expand-icon" id="icon-game-2">▸</span>
                 </div>
             </div>
             <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Louisiana Tech Bulldogs +1.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 142.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
+                    <div class="pick-chip pass">
+                        <span class="pick-label">PASS</span>
+                        <span class="pick-conf">No Edge</span>
                     </div></div>
             
-                <div class="analysis-panel" id="game-17">
+                <div class="analysis-panel" id="game-2">
                     <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
 The current spread, total, and moneyline from each book are:
-- DraftKings: Kennesaw -1.5, O/U 142.5, ML Kennesaw -122
-- FanDuel: Kennesaw -1.5, O/U 142.5, ML Kennesaw -111
-- BetMGM: Kennesaw -1.5, O/U 142.5, ML Kennesaw -118</p>
+- DraftKings: Michigan -6.5, O/U 153.5, ML Michigan -290
+- FanDuel: Michigan -6.5, O/U 151.5, ML Michigan -265</p>
 <p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
-Cross-book totals comparison: Books are in agreement — no significant divergence.</p>
+Cross-book totals comparison: <strong>* TOTALS DISAGREEMENT: DraftKings has O/U 153.5 while FanDuel average 151.5 (2.0 pts higher) </strong>*
+  <strong>* TOTALS DISAGREEMENT: FanDuel has O/U 151.5 while DraftKings average 153.5 (2.0 pts lower) </strong>*</p>
 <p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
-For the spread, there has been no movement at either DraftKings or FanDuel, with both books holding Kennesaw at -1.5 and Louisiana at +1.5. This indicates strong market consensus and confidence in the current spread number. For the total, both DraftKings and FanDuel have seen movement towards the OVER. DraftKings moved from 141.5 to 142.5 (up 1.0 point), and FanDuel moved from 140.5 to 142.5 (up 2.0 points), signaling that the market is adjusting towards a higher-scoring game.</p>
+Neither DraftKings nor FanDuel has shown any movement on the spread for Michigan -6.5 or Purdue +6.5. This indicates strong market confidence in the current spread. Similarly, there has been no movement on the total at either DraftKings (O/U 153.5) or FanDuel (O/U 151.5), suggesting the market is also confident in these numbers despite the cross-book difference.</p>
 <p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
-The spread of Kennesaw -1.5 suggests a very close contest, which is consistent with the season average margins of Kennesaw (+7.2) and Louisiana (+5.3), showing only a +1.9 difference. However, recent form strongly favors Louisiana Tech, who has an average margin of +10.8 over their last 5 games, significantly outperforming Kennesaw&#x27;s +2.6 margin in their last 5. This indicates Louisiana Tech is currently playing at a higher level. While Kennesaw has a strong 61.1% ATS record as a favorite, Louisiana Tech also boasts a robust 60.0% ATS record as an underdog, suggesting the market consistently undervalues them in this role. The scoring matchup presents a mixed picture, with Kennesaw&#x27;s offense showing a +18.9 mismatch against Louisiana&#x27;s defense, but Kennesaw&#x27;s defense is also expected to limit Louisiana&#x27;s offense. Given the neutral site and similar rest, the superior recent form of Louisiana Tech, combined with their strong ATS record as an underdog, provides a lean towards Louisiana Tech +1.5.</p>
+The data presents a nuanced picture for the spread of Michigan -6.5. Michigan has a season margin of +18.4 compared to Purdue&#x27;s +11.6, giving Michigan a 6.8-point better season margin, which aligns very closely with the -6.5 spread. Michigan also boasts a strong 55.0% ATS cover rate as a favorite, suggesting the market consistently undervalues them in this role. However, Purdue, despite a poor overall ATS record of 38.2%, has been a &quot;scrappy underdog,&quot; covering 60.0% of the time in that role. Recent form is nearly identical, with Michigan at +6.8 and Purdue at +7.2 average margins in their last five games. Both teams are on back-to-back rest, negating any rest advantage. With the season margin closely matching the spread and conflicting ATS signals from both teams, there is no clear edge on the spread.</p>
 <p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
-The data presents a clear edge on the total. Our pre-computed expected total of 147.6 points is a significant 5.1 points above the current posted line of 142.5. This gap exceeds the 5-point threshold, indicating a meaningful OVER signal from the statistical models. This statistical lean is strongly confirmed by the line movement, as both DraftKings and FanDuel have adjusted their totals upwards by 1.0 to 2.0 points towards the OVER. The combined offensive pace of 153.9 ppg also suggests a higher-scoring game than the combined defensive yield of 141.3 papg. All signals align for the OVER.</p>
+The posted total from DraftKings is 153.5, while our expected total is 154.0. This 0.5-point gap is below the 3-point threshold and is not considered a meaningful edge from stats alone, indicating the line is well-priced. There has been no line movement on the total at either DraftKings or FanDuel, reinforcing market confidence. While there is a 2.0-point cross-book disagreement between DraftKings (O/U 153.5) and FanDuel (O/U 151.5), the pre-computed analysis explicitly states &quot;No meaningful edge&quot; and &quot;No edge from stats alone&quot; for the total. Therefore, despite the differing lines, the overall data does not support a strong lean on either the Over or Under.</p>
 <p style='margin:0 0 12px;line-height:1.6'><strong>5. SITUATIONAL FACTORS</strong>
-There are no injuries reported for either Kennesaw St Owls or Louisiana Tech Bulldogs. Both teams are on similar short rest, having played two days prior, so neither team holds a rest advantage. As this is a neutral site tournament game, home court advantage does not apply, and the game should be evaluated purely on team quality and recent performance.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>6. CONCLUSION</strong>
-SPREAD VERDICT: Louisiana Tech Bulldogs +1.5 at MEDIUM
-TOTALS VERDICT: OVER 142.5 at HIGH</p>
-<p style='margin:0 0 12px;line-height:1.6'>RECOMMENDATION 1: Louisiana Tech Bulldogs +1.5 — MEDIUM
-Louisiana Tech has shown significantly better recent form, boasting a +10.8 average margin over their last 5 games compared to Kennesaw&#x27;s +2.6. Furthermore, Louisiana Tech has a strong 60.0% ATS record as an underdog this season, indicating the market often undervalues them.
-RECOMMENDATION 2: OVER 142.5 — HIGH
-The pre-computed expected total of 147.6 points is a significant 5.1 points above the current line of 142.5, exceeding the actionable threshold. This strong statistical lean towards the Over is further confirmed by line movement across multiple books, with the total moving up by 1.0 to 2.0 points.</p></div>
-                </div>
-        </div>
-        <div class="game-card analyzed" onclick="toggleAnalysis('game-18')">
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot analyzed"></span>
-                    <span class="team away">Virginia Cavaliers</span>
-                    <span class="at">@</span>
-                    <span class="team home">Duke Blue Devils</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">Duke -6.5 · O/U 140.5</span>
-                    <span class="tip-time">8:30 PM ET</span>
-                    <span class="expand-icon" id="icon-game-18">▸</span>
-                </div>
-            </div>
-            <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Virginia +6.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 140.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                    </div></div>
-            
-                <div class="analysis-panel" id="game-18">
-                    <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
-The current spread, total, and moneyline from each book are:
-- DraftKings: Duke -6.5, O/U 140.5, ML Duke -305
-- FanDuel: Duke -6.5, O/U 139.5, ML Duke -275
-- BetMGM: Duke -6.5, O/U 139.5, ML Duke -295</p>
-<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
-Cross-book totals comparison: <strong>* TOTALS DISAGREEMENT: DraftKings has O/U 140.5 while FanDuel, BetMGM average 139.5 (1.0 pts higher) </strong>*</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
-The spread line has seen significant movement, shifting from Duke -8.5 to Duke -6.5 across both DraftKings and FanDuel. This represents a 2.0-point adjustment towards Virginia, indicating market consensus is fading Duke as a heavy favorite and favoring the underdog. For the total, both DraftKings and FanDuel have seen upward movement. DraftKings moved from 137.5 to 140.5 (up 3.0 points), and FanDuel moved from 138.5 to 139.5 (up 1.0 point). This consistent upward movement signals that the market is adjusting towards the OVER.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
-The data presents a nuanced picture for the spread of Duke -6.5. While Duke boasts a superior season margin of +19.6 compared to Virginia&#x27;s +12.7 (a 6.9-point difference), and their recent form is significantly better with a +16.6 margin over the last five games versus Virginia&#x27;s +2.4, several factors lean against Duke covering. Crucially, Duke is a poor cover team, with an overall ATS record of 16-20 (44.4% cover rate) and 15-16 as a favorite. The market consistently overvalues them. Furthermore, Duke is on back-to-back rest (1 day), while Virginia has 2 days, presenting a fatigue disadvantage for the Blue Devils in this neutral site tournament game. The line movement also strongly supports Virginia, with the spread moving 2.0 points from Duke -8.5 to Duke -6.5, indicating the market is adjusting towards the underdog. Given Duke&#x27;s poor ATS record and the market&#x27;s adjustment, the weight of evidence favors Virginia +6.5.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
-The total of 140.5 (DraftKings) shows a clear lean towards the OVER. Our pre-computed expected total of 147.3 is 6.8 points above the posted line, which significantly exceeds the 5-point threshold for a meaningful OVER signal. This statistical lean is strongly confirmed by line movement, as both DraftKings and FanDuel have seen their totals move upward, with DraftKings increasing from 137.5 to 140.5 and FanDuel from 138.5 to 139.5. Additionally, there is a cross-book disagreement where DraftKings&#x27; 140.5 is 1.0 point higher than FanDuel and BetMGM&#x27;s 139.5, further supporting the OVER. The combined scoring pace of 163.5 ppg and combined defensive yield of 131.1 papg also suggest a higher-scoring affair than the posted line implies.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>5. SITUATIONAL FACTORS</strong>
-No injuries are reported for either Duke Blue Devils or Virginia Cavaliers. A key situational factor is Duke playing on back-to-back rest (1 day), which could introduce a fatigue element compared to Virginia&#x27;s 2 days of rest. This is a neutral site game, so home court advantage does not apply.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>6. CONCLUSION</strong>
-SPREAD VERDICT: Virginia +6.5 at MEDIUM
-TOTALS VERDICT: OVER 140.5 at HIGH</p>
-<p style='margin:0 0 12px;line-height:1.6'>RECOMMENDATION 1: Virginia +6.5 — MEDIUM
-Despite Duke&#x27;s strong season and recent form, they are a poor cover team (44.4% ATS) and the market has moved the line 2.0 points towards Virginia. Duke also faces a fatigue disadvantage on back-to-back rest.
-RECOMMENDATION 2: OVER 140.5 — HIGH
-The expected total of 147.3 is 6.8 points above the posted line of 140.5, a significant OVER signal confirmed by upward line movement across multiple books and a cross-book disagreement favoring the higher total.</p></div>
-                </div>
-        </div>
-        <div class="game-card analyzed" onclick="toggleAnalysis('game-19')">
-            <div class="game-header">
-                <div class="matchup">
-                    <span class="status-dot analyzed"></span>
-                    <span class="team away">Hawai&#x27;i Rainbow Warriors</span>
-                    <span class="at">@</span>
-                    <span class="team home">UC Irvine Anteaters</span>
-                </div>
-                <div class="game-meta">
-                    <span class="odds-line">UC -1.5 · O/U 142.5</span>
-                    <span class="tip-time">10:00 PM ET</span>
-                    <span class="expand-icon" id="icon-game-19">▸</span>
-                </div>
-            </div>
-            <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 142.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                    </div></div>
-            
-                <div class="analysis-panel" id="game-19">
-                    <div class="analysis-content"><p style='margin:0 0 12px;line-height:1.6'><strong>1. WHAT THE LINES ARE SAYING</strong>
-The current spread, total, and moneyline from each book are:
-- DraftKings: UC -1.5, O/U 142.5, ML UC -120
-- FanDuel: UC -1.5, O/U 141.5, ML UC -120
-- BetMGM: UC -1.5, O/U 142.5, ML UC -118</p>
-<p style='margin:0 0 12px;line-height:1.6'>Cross-book spread comparison: Books are in agreement — no significant divergence.
-Cross-book totals comparison: <strong>* TOTALS DISAGREEMENT: FanDuel has O/U 141.5 while DraftKings, BetMGM average 142.5 (1.0 pts lower) </strong>*</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>2. LINE MOVEMENT</strong>
-DraftKings&#x27; spread moved from UC -2.5 to -1.5, indicating a shift of 1.0 point towards Hawai&#x27;i as the underdog. FanDuel&#x27;s spread remained steady at UC -1.5, suggesting confidence in that specific number. For the total, both DraftKings and FanDuel saw significant upward movement, with DraftKings moving from 138.5 to 142.5 (UP 4.0 points) and FanDuel moving from 138.5 to 141.5 (UP 3.0 points). This strong upward movement across books signals market adjustment towards the OVER.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>3. SPREAD ANALYSIS</strong>
-The spread of UC -1.5 suggests a very close contest, which is supported by the season margins being nearly equal (UC +9.5 vs Hawai&#x27;i +10.0). While UC Irvine has shown better recent form with a +10.4 average margin over their last 5 games compared to Hawai&#x27;i&#x27;s +6.2, the ATS records for both teams in their respective roles are neutral. UC is 12-12 (50.0%) ATS as a favorite, and Hawai&#x27;i is 3-3 (50.0%) ATS as an underdog. The line movement at DraftKings, shifting from UC -2.5 to -1.5, suggests some market lean away from UC covering a larger spread. Given the neutral ATS records, the very tight spread, and conflicting signals from recent form versus line movement, there is no clear edge on the spread.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>4. TOTALS ANALYSIS</strong>
-The data presents a strong case for the OVER. Our pre-computed expected total of 148.0 is 5.5 points above the current DraftKings line of 142.5, which exceeds the 5-point threshold for a meaningful OVER signal. This statistical lean is strongly confirmed by significant line movement across the market; DraftKings&#x27; total moved up 4.0 points from 138.5 to 142.5, and FanDuel&#x27;s moved up 3.0 points from 138.5 to 141.5, both indicating market adjustment towards the OVER. Although FanDuel&#x27;s current line of 141.5 is 1.0 point lower than other books, the overall trend and the substantial gap between the expected total and the posted lines point to value on the OVER.</p>
-<p style='margin:0 0 12px;line-height:1.6'><strong>5. SITUATIONAL FACTORS</strong>
-Both teams are playing on back-to-back rest (1 day), meaning fatigue is an equal factor for both sides and does not provide a differential edge. This is a neutral site game, so home court advantage is not a factor. No injuries have been reported for either UC Irvine or Hawai&#x27;i.</p>
+No injuries are reported for either Michigan or Purdue. Both teams are playing on back-to-back days with 1 day of rest, meaning fatigue is an equal factor for both sides. This is a neutral site game, so home-court advantage does not apply.</p>
 <p style='margin:0 0 12px;line-height:1.6'><strong>6. CONCLUSION</strong>
 SPREAD VERDICT: NO EDGE
-TOTALS VERDICT: OVER 142.5 at HIGH</p>
-<p style='margin:0 0 12px;line-height:1.6'>RECOMMENDATION: OVER 142.5 — HIGH
-The expected total of 148.0 is 5.5 points above the current line of 142.5, a significant statistical signal for the Over. This is strongly confirmed by market movement, with DraftKings&#x27; total moving up 4.0 points and FanDuel&#x27;s up 3.0 points towards the Over.
-Spread: NO EDGE</p></div>
+TOTALS VERDICT: NO EDGE</p>
+<p style='margin:0 0 12px;line-height:1.6'>NO EDGE — PASS ON THIS GAME
+An edge on the spread would require a clearer divergence in ATS records, a more significant gap between the season margin and the spread, or notable line movement. For the total, a larger discrepancy between the expected total and the posted line (e.g., over 3 points) or confirming line movement would be necessary to identify a genuine edge.</p></div>
                 </div>
         </div>
     </div>
- 
+
     <div class="footer">
-        Updated 9:50 PM ET · betbuddy
+        Updated 11:11 AM ET · betbuddy
     </div>
- 
+
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
- 
+
     <script>
         function toggleAnalysis(id) {
             const panel = document.getElementById(id);
@@ -804,7 +507,7 @@ Spread: NO EDGE</p></div>
                 icon.classList.toggle('open');
             }
         }
- 
+
         function toggleTheme() {
             const body = document.body;
             const btn = document.getElementById('theme-toggle');
@@ -813,7 +516,7 @@ Spread: NO EDGE</p></div>
             btn.textContent = isLight ? '☀️' : '🌙';
             localStorage.setItem('betbuddy-theme', isLight ? 'light' : 'dark');
         }
- 
+
         // Load saved preference
         (function() {
             const saved = localStorage.getItem('betbuddy-theme');
