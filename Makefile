@@ -71,6 +71,9 @@ unpick:
 ats:
 	python3 -m data.fetch_ats
 
+slate:
+	python3 slate.py
+
 # Manual pick entry (if auto-parse fails)
 log:
 	python3 prediction_logger.py

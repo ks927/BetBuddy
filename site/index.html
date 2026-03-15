@@ -3,132 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BetBuddy — NCAAB Picks</title>
+    <title>BetBuddy — Today's NCAAB Slate</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
  
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a0a0a;
+            font-family: 'DM Sans', sans-serif;
+            background: #09090b;
             color: #e2e8f0;
             min-height: 100vh;
-            padding: 0;
         }
  
         .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-bottom: 1px solid #1e293b;
-            padding: 32px 24px;
-            text-align: center;
+            background: #09090b;
+            border-bottom: 1px solid #1c1c22;
+            padding: 28px 24px 20px;
+        }
+ 
+        .header-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
         }
  
         .header h1 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
+            color: #f4f4f5;
             letter-spacing: -0.5px;
-            color: #f8fafc;
-            margin-bottom: 4px;
         }
  
-        .header .subtitle {
-            font-size: 14px;
-            color: #64748b;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .header h1 span {
+            color: #3b82f6;
         }
  
-        .record-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 32px;
-            padding: 20px 24px;
-            background: #0f172a;
-            border-bottom: 1px solid #1e293b;
-            flex-wrap: wrap;
-        }
- 
-        .record-stat {
-            text-align: center;
-        }
- 
-        .record-stat .value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 24px;
-            font-weight: 700;
-            color: #f8fafc;
-        }
- 
-        .record-stat .label {
-            font-size: 11px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 2px;
-        }
- 
-        .streak-row {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            padding: 12px 24px;
-            background: #0a0a0a;
-        }
- 
-        .streak-dot {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
- 
-        .streak-dot.win { background: #052e16; color: #22c55e; }
-        .streak-dot.loss { background: #2a0a0a; color: #ef4444; }
-        .streak-dot.push { background: #1a1a0a; color: #f59e0b; }
- 
-        .date-header {
-            padding: 20px 24px 8px;
+        .header .date {
             font-size: 13px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            color: #52525b;
+        }
+ 
+        .subheader {
             max-width: 720px;
             margin: 0 auto;
+            padding: 16px 24px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .game-count {
+            font-size: 13px;
+            color: #71717a;
+        }
+ 
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #52525b;
+        }
+ 
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
  
         .container {
             max-width: 720px;
             margin: 0 auto;
-            padding: 0 16px 48px;
+            padding: 8px 16px 48px;
         }
  
         .game-card {
-            background: #111827;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: border-color 0.2s;
+            background: #111113;
+            border: 1px solid #1c1c22;
+            border-radius: 10px;
+            margin-bottom: 8px;
             overflow: hidden;
+            transition: border-color 0.15s;
         }
  
-        .game-card:hover {
-            border-color: #334155;
+        .game-card.analyzed {
+            cursor: pointer;
+        }
+ 
+        .game-card.analyzed:hover {
+            border-color: #27272a;
+        }
+ 
+        .game-card.pending {
+            opacity: 0.55;
         }
  
         .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 14px 16px;
+            gap: 12px;
         }
  
         .matchup {
@@ -136,34 +114,58 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            min-width: 0;
+        }
+ 
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+ 
+        .status-dot.analyzed {
+            background: #3b82f6;
+        }
+ 
+        .status-dot.pending {
+            background: #27272a;
         }
  
         .team {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
+            color: #e4e4e7;
         }
  
         .at {
-            color: #475569;
-            font-size: 13px;
+            color: #3f3f46;
+            font-size: 12px;
         }
  
         .game-meta {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+ 
+        .odds-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #52525b;
         }
  
         .tip-time {
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: #64748b;
+            color: #3f3f46;
         }
  
         .expand-icon {
-            color: #475569;
-            font-size: 14px;
-            transition: transform 0.2s;
+            color: #3f3f46;
+            font-size: 13px;
+            transition: transform 0.15s;
         }
  
         .expand-icon.open {
@@ -172,8 +174,8 @@
  
         .picks-row {
             display: flex;
-            gap: 8px;
-            padding: 0 20px 16px;
+            gap: 6px;
+            padding: 0 16px 12px;
             flex-wrap: wrap;
         }
  
@@ -181,9 +183,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #1e293b;
-            border-radius: 8px;
-            padding: 8px 14px;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 6px;
+            padding: 6px 12px;
         }
  
         .pick-chip.pass {
@@ -192,13 +195,13 @@
  
         .pick-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            color: #f8fafc;
+            color: #f4f4f5;
         }
  
         .pick-conf {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -211,261 +214,419 @@
         }
  
         .analysis-panel.open {
-            max-height: 2000px;
+            max-height: 3000px;
             transition: max-height 0.5s ease-in;
         }
  
         .analysis-content {
-            padding: 0 20px 20px;
+            padding: 0 16px 16px;
             font-size: 13px;
-            color: #94a3b8;
-            border-top: 1px solid #1e293b;
-            padding-top: 16px;
+            color: #a1a1aa;
+            border-top: 1px solid #1c1c22;
+            padding-top: 14px;
+            line-height: 1.65;
         }
  
-        .no-picks {
-            text-align: center;
-            padding: 48px 24px;
-            color: #64748b;
-        }
- 
-        .no-picks p:first-child {
-            font-size: 18px;
-            color: #94a3b8;
-            margin-bottom: 8px;
+        .analysis-content strong {
+            color: #e4e4e7;
         }
  
         .footer {
             text-align: center;
             padding: 24px;
-            font-size: 12px;
-            color: #334155;
+            font-size: 11px;
+            color: #27272a;
             font-family: 'JetBrains Mono', monospace;
         }
  
         @media (max-width: 480px) {
-            .header h1 { font-size: 22px; }
-            .record-bar { gap: 20px; }
-            .record-stat .value { font-size: 20px; }
-            .game-header { padding: 12px 16px; }
-            .picks-row { padding: 0 16px 12px; }
-            .team { font-size: 14px; }
+            .header-inner { flex-direction: column; gap: 4px; }
+            .game-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .game-meta { width: 100%; justify-content: space-between; }
+            .team { font-size: 13px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>BetBuddy</h1>
-        <div class="subtitle">NCAAB Betting Analysis</div>
-    </div>
- 
-    <div class="record-bar">
-        <div class="record-stat">
-            <div class="value">43-31</div>
-            <div class="label">Record</div>
-        </div>
-        <div class="record-stat">
-            <div class="value">58.1%</div>
-            <div class="label">Win Rate</div>
-        </div>
-        <div class="record-stat">
-            <div class="value">74</div>
-            <div class="label">Total Picks</div>
+        <div class="header-inner">
+            <h1>Bet<span>Buddy</span></h1>
+            <span class="date">Saturday, March 14, 2026</span>
         </div>
     </div>
  
-    <div class="streak-row"><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span><span class="streak-dot win">W</span><span class="streak-dot win">W</span><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span><span class="streak-dot loss">L</span></div>
- 
-    <div class="date-header">Saturday, March 14, 2026</div>
+    <div class="subheader">
+        <span class="game-count">20 games · 0 analyzed</span>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="status-dot analyzed"></span>
+                Analyzed
+            </div>
+            <div class="legend-item">
+                <span class="status-dot pending"></span>
+                Pending
+            </div>
+        </div>
+    </div>
  
     <div class="container">
         
-            <div class="game-card" onclick="toggleAnalysis('game-0')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">vanderbilt</span>
-                        <span class="at">@</span>
-                        <span class="team home">florida gators</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time">1:00 PM ET</span>
-                        <span class="expand-icon" id="icon-game-0">▸</span>
-                    </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Cornell Big Red</span>
+                    <span class="at">@</span>
+                    <span class="team home">Yale Bulldogs</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Vanderbilt +8.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-0">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Yale -4.5 · O/U 163.5</span>
+                    <span class="tip-time">11:00 AM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-1')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">wisconsin</span>
-                        <span class="at">@</span>
-                        <span class="team home">michigan wolverines</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time">1:00 PM ET</span>
-                        <span class="expand-icon" id="icon-game-1">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Vermont Catamounts</span>
+                    <span class="at">@</span>
+                    <span class="team home">UMBC Retrievers</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Michigan -12.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">UNDER 160.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-1">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">UMBC -2.5 · O/U 136.5</span>
+                    <span class="tip-time">11:00 AM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-2')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">ole miss</span>
-                        <span class="at">@</span>
-                        <span class="team home">arkansas razorbacks</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time">3:46 PM ET</span>
-                        <span class="expand-icon" id="icon-game-2">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Dayton Flyers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Saint Louis Billikens</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Arkansas -9.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-2">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Saint -5.5 · O/U 148.5</span>
+                    <span class="tip-time">1:00 PM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-3')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">purdue</span>
-                        <span class="at">@</span>
-                        <span class="team home">ucla</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time">3:30 PM ET</span>
-                        <span class="expand-icon" id="icon-game-3">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Vanderbilt Commodores</span>
+                    <span class="at">@</span>
+                    <span class="team home">Florida Gators</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Ucla +7.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-3">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Florida -8.5 · O/U 160.5</span>
+                    <span class="tip-time">1:00 PM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-4')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">arizona wildcats</span>
-                        <span class="at">@</span>
-                        <span class="team home">houston cougars</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time"></span>
-                        <span class="expand-icon" id="icon-game-4">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">North Carolina Central Eagles</span>
+                    <span class="at">@</span>
+                    <span class="team home">Howard Bison</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Houston +2.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 137.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-4">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Howard -12.5 · O/U 144.5</span>
+                    <span class="tip-time">1:00 PM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-5')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">uconn</span>
-                        <span class="at">@</span>
-                        <span class="team home">st. john&#x27;s</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time">6:30 PM ET</span>
-                        <span class="expand-icon" id="icon-game-5">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Wisconsin Badgers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Michigan Wolverines</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Uconn -2.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                        
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 141.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-5">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Michigan -12.5 · O/U 160.5</span>
+                    <span class="tip-time">1:00 PM ET</span>
+                    
                 </div>
             </div>
-            <div class="game-card" onclick="toggleAnalysis('game-6')">
-                <div class="game-header">
-                    <div class="matchup">
-                        <span class="team away">duke</span>
-                        <span class="at">@</span>
-                        <span class="team home">virginia cavaliers</span>
-                    </div>
-                    <div class="game-meta">
-                        <span class="tip-time"></span>
-                        <span class="expand-icon" id="icon-game-6">▸</span>
-                    </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Pennsylvania Quakers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Harvard Crimson</span>
                 </div>
-                <div class="picks-row">
-                    <div class="pick-chip">
-                        <span class="pick-label">Virginia +8.5</span>
-                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
-                        
-                    </div>
-                    <div class="pick-chip">
-                        <span class="pick-label">OVER 137.5</span>
-                        <span class="pick-conf" style="color:#ef4444">HIGH</span>
-                        
-                    </div></div>
-                <div class="analysis-panel" id="game-6">
-                    <div class="analysis-content"><p style='color:#9ca3af;font-style:italic'>Analysis not available for this pick.</p></div>
+                <div class="game-meta">
+                    <span class="odds-line">Harvard -2.5 · O/U 136.5</span>
+                    <span class="tip-time">2:00 PM ET</span>
+                    
                 </div>
             </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Charlotte 49ers</span>
+                    <span class="at">@</span>
+                    <span class="team home">South Florida Bulls</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">South -14.5 · O/U 153.5</span>
+                    <span class="tip-time">3:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Ole Miss Rebels</span>
+                    <span class="at">@</span>
+                    <span class="team home">Arkansas Razorbacks</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Arkansas -3.5 · O/U 182.5</span>
+                    <span class="tip-time">3:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Purdue Boilermakers</span>
+                    <span class="at">@</span>
+                    <span class="team home">UCLA Bruins</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">UCLA +7.5 · O/U 147.5</span>
+                    <span class="tip-time">3:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Saint Joseph&#x27;s Hawks</span>
+                    <span class="at">@</span>
+                    <span class="team home">VCU Rams</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">VCU -18.5 · O/U 142.5</span>
+                    <span class="tip-time">3:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Tulsa Golden Hurricane</span>
+                    <span class="at">@</span>
+                    <span class="team home">Wichita St Shockers</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Wichita -1.5 · O/U 153.5</span>
+                    <span class="tip-time">5:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Houston Cougars</span>
+                    <span class="at">@</span>
+                    <span class="team home">Arizona Wildcats</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Arizona -1.5 · O/U 138.5</span>
+                    <span class="tip-time">6:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">San Diego St Aztecs</span>
+                    <span class="at">@</span>
+                    <span class="team home">Utah State Aggies</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Utah -2.5 · O/U 145.5</span>
+                    <span class="tip-time">6:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">UConn Huskies</span>
+                    <span class="at">@</span>
+                    <span class="team home">St. John&#x27;s Red Storm</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">St. +2.5 · O/U 138.5</span>
+                    <span class="tip-time">6:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Prairie View Panthers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Southern Jaguars</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Southern -2.5 · O/U 145.5</span>
+                    <span class="tip-time">7:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Toledo Rockets</span>
+                    <span class="at">@</span>
+                    <span class="team home">Akron Zips</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Akron -8.5 · O/U 157.5</span>
+                    <span class="tip-time">8:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Kennesaw St Owls</span>
+                    <span class="at">@</span>
+                    <span class="team home">Louisiana Tech Bulldogs</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Louisiana +1.5 · O/U 142.5</span>
+                    <span class="tip-time">8:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Virginia Cavaliers</span>
+                    <span class="at">@</span>
+                    <span class="team home">Duke Blue Devils</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">Duke -6.5 · O/U 140.5</span>
+                    <span class="tip-time">8:30 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="game-card pending" >
+            <div class="game-header">
+                <div class="matchup">
+                    <span class="status-dot pending"></span>
+                    <span class="team away">Hawai&#x27;i Rainbow Warriors</span>
+                    <span class="at">@</span>
+                    <span class="team home">UC Irvine Anteaters</span>
+                </div>
+                <div class="game-meta">
+                    <span class="odds-line">UC -1.5 · O/U 142.5</span>
+                    <span class="tip-time">10:00 PM ET</span>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
     </div>
  
     <div class="footer">
-        Updated 7:21 PM ET · Powered by data, not vibes
+        Updated 9:17 PM ET · betbuddy
     </div>
  
     <script>
         function toggleAnalysis(id) {
             const panel = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
-            panel.classList.toggle('open');
-            icon.classList.toggle('open');
+            if (panel) {
+                panel.classList.toggle('open');
+            }
+            if (icon) {
+                icon.classList.toggle('open');
+            }
         }
     </script>
 </body>
