@@ -79,7 +79,7 @@ log:
 	python3 prediction_logger.py
 
 publish:
-	python3 publish.py --push
+	python3 slate.py && python3 publish.py --push
 
 publish-preview:
 	python3 publish.py
