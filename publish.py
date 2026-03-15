@@ -593,6 +593,11 @@ def push_to_gh_pages():
         return
  
     try:
+        # Read the generated HTML BEFORE switching branches
+        # (the site/ dir won't exist on gh-pages)
+        with open(OUTPUT_FILE, "r") as f:
+            html_content = f.read()
+ 
         current_branch = subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
         ).strip()
@@ -608,8 +613,9 @@ def push_to_gh_pages():
         else:
             subprocess.run(["git", "checkout", "gh-pages"], check=True)
  
-        import shutil
-        shutil.copy(OUTPUT_FILE, "index.html")
+        # Write the HTML we read earlier
+        with open("index.html", "w") as f:
+            f.write(html_content)
  
         subprocess.run(["git", "add", "index.html"], check=True)
  
