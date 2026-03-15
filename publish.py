@@ -285,16 +285,61 @@ def generate_html(games, conn):
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
  
+        :root {{
+            --bg: #09090b;
+            --bg-card: #111113;
+            --bg-chip: #18181b;
+            --bg-header: #09090b;
+            --border: #1c1c22;
+            --border-hover: #27272a;
+            --text: #e2e8f0;
+            --text-heading: #f4f4f5;
+            --text-team: #e4e4e7;
+            --text-muted: #71717a;
+            --text-dim: #52525b;
+            --text-faint: #3f3f46;
+            --text-footer: #27272a;
+            --text-analysis: #a1a1aa;
+            --text-analysis-strong: #e4e4e7;
+            --accent: #3b82f6;
+            --dot-pending: #27272a;
+            --chip-border: #27272a;
+            --pending-opacity: 0.55;
+        }}
+ 
+        body.light {{
+            --bg: #fafafa;
+            --bg-card: #ffffff;
+            --bg-chip: #f4f4f5;
+            --bg-header: #fafafa;
+            --border: #e4e4e7;
+            --border-hover: #d4d4d8;
+            --text: #27272a;
+            --text-heading: #09090b;
+            --text-team: #18181b;
+            --text-muted: #71717a;
+            --text-dim: #a1a1aa;
+            --text-faint: #d4d4d8;
+            --text-footer: #d4d4d8;
+            --text-analysis: #52525b;
+            --text-analysis-strong: #18181b;
+            --accent: #2563eb;
+            --dot-pending: #d4d4d8;
+            --chip-border: #e4e4e7;
+            --pending-opacity: 0.45;
+        }}
+ 
         body {{
             font-family: 'DM Sans', sans-serif;
-            background: #09090b;
-            color: #e2e8f0;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.2s, color 0.2s;
         }}
  
         .header {{
-            background: #09090b;
-            border-bottom: 1px solid #1c1c22;
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border);
             padding: 28px 24px 20px;
         }}
  
@@ -310,17 +355,17 @@ def generate_html(games, conn):
             font-family: 'JetBrains Mono', monospace;
             font-size: 22px;
             font-weight: 700;
-            color: #f4f4f5;
+            color: var(--text-heading);
             letter-spacing: -0.5px;
         }}
  
         .header h1 span {{
-            color: #3b82f6;
+            color: var(--accent);
         }}
  
         .header .date {{
             font-size: 13px;
-            color: #52525b;
+            color: var(--text-dim);
         }}
  
         .subheader {{
@@ -334,14 +379,14 @@ def generate_html(games, conn):
  
         .game-count {{
             font-size: 13px;
-            color: #71717a;
+            color: var(--text-muted);
         }}
  
         .legend {{
             display: flex;
             gap: 16px;
             font-size: 12px;
-            color: #52525b;
+            color: var(--text-dim);
         }}
  
         .legend-item {{
@@ -357,12 +402,12 @@ def generate_html(games, conn):
         }}
  
         .game-card {{
-            background: #111113;
-            border: 1px solid #1c1c22;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 10px;
             margin-bottom: 8px;
             overflow: hidden;
-            transition: border-color 0.15s;
+            transition: border-color 0.15s, background 0.2s;
         }}
  
         .game-card.analyzed {{
@@ -370,11 +415,11 @@ def generate_html(games, conn):
         }}
  
         .game-card.analyzed:hover {{
-            border-color: #27272a;
+            border-color: var(--border-hover);
         }}
  
         .game-card.pending {{
-            opacity: 0.55;
+            opacity: var(--pending-opacity);
         }}
  
         .game-header {{
@@ -401,21 +446,21 @@ def generate_html(games, conn):
         }}
  
         .status-dot.analyzed {{
-            background: #3b82f6;
+            background: var(--accent);
         }}
  
         .status-dot.pending {{
-            background: #27272a;
+            background: var(--dot-pending);
         }}
  
         .team {{
             font-weight: 600;
             font-size: 14px;
-            color: #e4e4e7;
+            color: var(--text-team);
         }}
  
         .at {{
-            color: #3f3f46;
+            color: var(--text-faint);
             font-size: 12px;
         }}
  
@@ -429,17 +474,17 @@ def generate_html(games, conn):
         .odds-line {{
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: #52525b;
+            color: var(--text-dim);
         }}
  
         .tip-time {{
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: #3f3f46;
+            color: var(--text-faint);
         }}
  
         .expand-icon {{
-            color: #3f3f46;
+            color: var(--text-faint);
             font-size: 13px;
             transition: transform 0.15s;
         }}
@@ -459,8 +504,8 @@ def generate_html(games, conn):
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #18181b;
-            border: 1px solid #27272a;
+            background: var(--bg-chip);
+            border: 1px solid var(--chip-border);
             border-radius: 6px;
             padding: 6px 12px;
         }}
@@ -473,7 +518,7 @@ def generate_html(games, conn):
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             font-weight: 700;
-            color: #f4f4f5;
+            color: var(--text-heading);
         }}
  
         .pick-conf {{
@@ -497,22 +542,45 @@ def generate_html(games, conn):
         .analysis-content {{
             padding: 0 16px 16px;
             font-size: 13px;
-            color: #a1a1aa;
-            border-top: 1px solid #1c1c22;
+            color: var(--text-analysis);
+            border-top: 1px solid var(--border);
             padding-top: 14px;
             line-height: 1.65;
         }}
  
         .analysis-content strong {{
-            color: #e4e4e7;
+            color: var(--text-analysis-strong);
         }}
  
         .footer {{
             text-align: center;
             padding: 24px;
             font-size: 11px;
-            color: #27272a;
+            color: var(--text-footer);
             font-family: 'JetBrains Mono', monospace;
+        }}
+ 
+        .theme-toggle {{
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+            z-index: 100;
+        }}
+ 
+        .theme-toggle:hover {{
+            border-color: var(--border-hover);
         }}
  
         @media (max-width: 480px) {{
@@ -546,12 +614,14 @@ def generate_html(games, conn):
     </div>
  
     <div class="container">
-        {cards_html if cards_html else '<div style="text-align:center;padding:48px;color:#52525b">No games scheduled today.</div>'}
+        {cards_html if cards_html else '<div style="text-align:center;padding:48px;color:var(--text-dim)">No games scheduled today.</div>'}
     </div>
  
     <div class="footer">
         Updated {datetime.now(ET).strftime("%-I:%M %p ET")} · betbuddy
     </div>
+ 
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
  
     <script>
         function toggleAnalysis(id) {{
@@ -564,6 +634,24 @@ def generate_html(games, conn):
                 icon.classList.toggle('open');
             }}
         }}
+ 
+        function toggleTheme() {{
+            const body = document.body;
+            const btn = document.getElementById('theme-toggle');
+            body.classList.toggle('light');
+            const isLight = body.classList.contains('light');
+            btn.textContent = isLight ? '☀️' : '🌙';
+            localStorage.setItem('betbuddy-theme', isLight ? 'light' : 'dark');
+        }}
+ 
+        // Load saved preference
+        (function() {{
+            const saved = localStorage.getItem('betbuddy-theme');
+            if (saved === 'light') {{
+                document.body.classList.add('light');
+                document.getElementById('theme-toggle').textContent = '☀️';
+            }}
+        }})();
     </script>
 </body>
 </html>"""
