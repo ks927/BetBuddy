@@ -154,6 +154,29 @@ def get_predictions_for_game(conn, home_team, away_team, game_date):
     return matching, analysis_text
 
 
+def get_game_score(conn, game_id):
+    """Return (away_score, home_score, completed) for a game, or None if not available."""
+    try:
+        row = conn.execute(
+            "SELECT away_score, home_score, completed FROM scores WHERE id = ?",
+            (game_id,),
+        ).fetchone()
+        if row:
+            return row  # (away_score, home_score, completed)
+    except sqlite3.OperationalError:
+        # completed column missing — fall back to old schema
+        try:
+            row = conn.execute(
+                "SELECT away_score, home_score FROM scores WHERE id = ?",
+                (game_id,),
+            ).fetchone()
+            if row:
+                return (row[0], row[1], 1)
+        except sqlite3.OperationalError:
+            pass
+    return None
+
+
 def confidence_color(conf):
     return {"HIGH": "#ef4444", "MEDIUM": "#f59e0b", "LOW": "#6b7280"}.get(conf, "#6b7280")
 
@@ -216,6 +239,17 @@ def generate_html(games, conn):
         if has_analysis:
             analyzed_count += 1
 
+        # Get score (completed or in-progress)
+        score_data = get_game_score(conn, game["game_id"])
+        score_html = ""
+        if score_data:
+            away_score, home_score, completed = score_data
+            score_str = f"{away_score}–{home_score}"
+            if completed:
+                score_html = f'<span class="score-badge final">FINAL&nbsp;{score_str}</span>'
+            else:
+                score_html = f'<span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;{score_str}</span>'
+
         # Build picks chips
         picks_html = ""
         if picks:
@@ -255,6 +289,13 @@ def generate_html(games, conn):
         else:
             status = '<span class="status-dot pending"></span>'
 
+        # Right-side meta: score (if available) replaces tip time; show odds alongside
+        expand_icon = f'<span class="expand-icon" id="icon-game-{i}">&#9658;</span>' if has_analysis else ""
+        if score_html:
+            meta_right = score_html + expand_icon
+        else:
+            meta_right = f'<span class="tip-time">{tip}</span>' + expand_icon
+
         cards_html += f"""
         <div class="{card_class}" {onclick}>
             <div class="game-header">
@@ -266,8 +307,7 @@ def generate_html(games, conn):
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">{odds_str}</span>
-                    <span class="tip-time">{tip}</span>
-                    {'<span class="expand-icon" id="icon-game-' + str(i) + '">▸</span>' if has_analysis else ''}
+                    {meta_right}
                 </div>
             </div>
             {f'<div class="picks-row">{picks_html}</div>' if picks_html else ''}
@@ -481,6 +521,44 @@ def generate_html(games, conn):
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             color: var(--text-faint);
+        }}
+
+        .score-badge {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 7px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            letter-spacing: 0.3px;
+        }}
+
+        .score-badge.final {{
+            color: var(--text-muted);
+            background: var(--bg-chip);
+            border: 1px solid var(--border);
+        }}
+
+        .score-badge.live {{
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }}
+
+        .live-dot {{
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse-live 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }}
+
+        @keyframes pulse-live {{
+            0%, 100% {{ opacity: 1; transform: scale(1); }}
+            50% {{ opacity: 0.4; transform: scale(0.75); }}
         }}
 
         .expand-icon {{

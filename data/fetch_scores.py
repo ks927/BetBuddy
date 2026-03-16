@@ -24,7 +24,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "db", "sports
 # ── FETCH ─────────────────────────────────────────────────────────────────────
 
 def fetch_scores(days_back=3):
-    """Pull completed scores from The Odds API. Returns list of game dicts."""
+    """Pull scores from The Odds API (completed and in-progress). Returns list of game dicts."""
     if not API_KEY:
         print("✗ ODDS_API_KEY not set")
         return []
@@ -44,16 +44,17 @@ def fetch_scores(days_back=3):
 
     data = resp.json()
     games = []
+    completed_count = 0
+    live_count = 0
 
     for game in data:
-        if not game.get("completed"):
-            continue
+        completed = game.get("completed", False)
 
         scores = game.get("scores", [])
         if not scores or len(scores) < 2:
-            continue
+            continue  # No scores yet (game hasn't started)
 
-        score_map = {s["name"]: int(s["score"]) for s in scores if s.get("score")}
+        score_map = {s["name"]: int(s["score"]) for s in scores if s.get("score") is not None}
         home = game.get("home_team", "")
         away = game.get("away_team", "")
 
@@ -65,9 +66,14 @@ def fetch_scores(days_back=3):
                 "away_score": score_map[away],
                 "commence_time": game.get("commence_time", ""),
                 "game_id": game.get("id", ""),
+                "completed": completed,
             })
+            if completed:
+                completed_count += 1
+            else:
+                live_count += 1
 
-    print(f"✓ Fetched {len(games)} completed games (last {days_back} days)")
+    print(f"✓ Fetched {completed_count} completed, {live_count} in-progress (last {days_back} days)")
     return games
 
 
@@ -83,33 +89,39 @@ def store_scores(games):
             away_team TEXT NOT NULL,
             home_score INTEGER NOT NULL,
             away_score INTEGER NOT NULL,
+            completed INTEGER NOT NULL DEFAULT 1,
             commence_time TEXT,
             fetched_at TEXT NOT NULL
         )
     """)
 
+    # Migrate existing tables that predate the completed column
+    try:
+        conn.execute("ALTER TABLE scores ADD COLUMN completed INTEGER NOT NULL DEFAULT 1")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     inserted = 0
     for g in games:
-        try:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO scores
-                    (id, home_team, away_team, home_score, away_score, commence_time, fetched_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    g["game_id"],
-                    g["home_team"],
-                    g["away_team"],
-                    g["home_score"],
-                    g["away_score"],
-                    g["commence_time"],
-                    datetime.now().isoformat(),
-                ),
-            )
-            inserted += 1
-        except sqlite3.IntegrityError:
-            pass
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO scores
+                (id, home_team, away_team, home_score, away_score, completed, commence_time, fetched_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                g["game_id"],
+                g["home_team"],
+                g["away_team"],
+                g["home_score"],
+                g["away_score"],
+                1 if g.get("completed") else 0,
+                g["commence_time"],
+                datetime.now().isoformat(),
+            ),
+        )
+        inserted += 1
 
     conn.commit()
     conn.close()

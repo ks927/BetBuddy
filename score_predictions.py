@@ -138,9 +138,11 @@ def score_predictions():
         conn.close()
         return
  
-    # Get all scores
+    # Get completed scores only (ignore in-progress games)
     try:
-        scores = conn.execute("SELECT * FROM scores").fetchall()
+        scores = conn.execute(
+            "SELECT * FROM scores WHERE completed = 1 OR completed IS NULL"
+        ).fetchall()
     except sqlite3.OperationalError:
         print("✗ No scores table found. Run: python3 -m data.fetch_scores")
         conn.close()

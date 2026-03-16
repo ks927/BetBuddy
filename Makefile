@@ -81,6 +81,10 @@ log:
 publish:
 	python3 slate.py && python3 publish.py --push
 
+# Refresh live/final scores and republish (no slate re-run, saves API quota)
+live:
+	python3 -m data.fetch_scores && python3 publish.py --push
+
 publish-preview:
 	python3 publish.py
 
@@ -89,4 +93,4 @@ reset:
 	rm -f db/sports.db
 	@echo "Database cleared."
 
-.PHONY: fetch odds stats injuries today games query reset
+.PHONY: fetch odds stats injuries today games query reset live
