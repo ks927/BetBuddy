@@ -13,6 +13,7 @@ import os
 import sys
 import re
 import html
+import json
 import subprocess
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
@@ -297,7 +298,7 @@ def generate_html(games, conn):
             meta_right = f'<span class="tip-time">{tip}</span>' + expand_icon
 
         cards_html += f"""
-        <div class="{card_class}" {onclick}>
+        <div class="{card_class}" {onclick} data-game-id="{game['game_id']}">
             <div class="game-header">
                 <div class="matchup">
                     {status}
@@ -730,15 +731,89 @@ def generate_html(games, conn):
                 document.getElementById('theme-toggle').textContent = '☀️';
             }}
         }})();
+
+        // Live score polling — fetches scores.json every 60s and updates cards
+        async function pollScores() {{
+            try {{
+                const resp = await fetch('scores.json?t=' + Date.now());
+                if (!resp.ok) return;
+                const data = await resp.json();
+                for (const [gameId, score] of Object.entries(data.scores || {{}})) {{
+                    const card = document.querySelector(`[data-game-id="${{gameId}}"]`);
+                    if (!card) continue;
+                    const meta = card.querySelector('.game-meta');
+                    if (!meta) continue;
+
+                    const scoreStr = score.away + '–' + score.home;
+                    let badge = card.querySelector('.score-badge');
+
+                    if (badge) {{
+                        // Update existing badge
+                        if (score.completed) {{
+                            badge.className = 'score-badge final';
+                            badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
+                        }} else {{
+                            badge.className = 'score-badge live';
+                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                        }}
+                    }} else {{
+                        // Insert badge, replacing tip time
+                        const tipEl = meta.querySelector('.tip-time');
+                        if (!tipEl) continue;
+                        badge = document.createElement('span');
+                        if (score.completed) {{
+                            badge.className = 'score-badge final';
+                            badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
+                        }} else {{
+                            badge.className = 'score-badge live';
+                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                        }}
+                        tipEl.replaceWith(badge);
+                    }}
+                }}
+            }} catch (e) {{
+                // Silently fail — scores are nice-to-have
+            }}
+        }}
+
+        pollScores();
+        setInterval(pollScores, 60000);
     </script>
 </body>
 </html>"""
+
+
+def generate_scores_json(games, conn):
+    """Write scores.json for client-side polling. Keyed by game_id."""
+    scores = {}
+    for game in games:
+        score_data = get_game_score(conn, game["game_id"])
+        if score_data:
+            away_score, home_score, completed = score_data
+            scores[game["game_id"]] = {
+                "away": away_score,
+                "home": home_score,
+                "completed": bool(completed),
+            }
+
+    output = {
+        "updated_at": datetime.now(ET).isoformat(),
+        "scores": scores,
+    }
+
+    scores_file = os.path.join(OUTPUT_DIR, "scores.json")
+    with open(scores_file, "w") as f:
+        json.dump(output, f)
+
+    print(f"✓ Generated scores.json ({len(scores)} scores)")
+    return scores_file
 
 
 def publish():
     conn = sqlite3.connect(DB_PATH)
     games = get_todays_schedule(conn)
     html_content = generate_html(games, conn)
+    generate_scores_json(games, conn)
     conn.close()
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -758,11 +833,18 @@ def push_to_gh_pages():
         print("✗ No index.html to push.")
         return
 
+    scores_file = os.path.join(OUTPUT_DIR, "scores.json")
+
     try:
-        # Read the generated HTML BEFORE switching branches
+        # Read generated files BEFORE switching branches
         # (the site/ dir won't exist on gh-pages)
         with open(OUTPUT_FILE, "r") as f:
             html_content = f.read()
+
+        scores_content = None
+        if os.path.exists(scores_file):
+            with open(scores_file, "r") as f:
+                scores_content = f.read()
 
         current_branch = subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
@@ -782,11 +864,15 @@ def push_to_gh_pages():
         else:
             subprocess.run(["git", "checkout", "gh-pages"], check=True)
 
-        # Write the HTML we read earlier
+        # Write files we read earlier
         with open("index.html", "w") as f:
             f.write(html_content)
 
-        subprocess.run(["git", "add", "index.html"], check=True)
+        if scores_content is not None:
+            with open("scores.json", "w") as f:
+                f.write(scores_content)
+
+        subprocess.run(["git", "add", "index.html", "scores.json"], check=True)
 
         result = subprocess.run(["git", "diff", "--cached", "--quiet"], capture_output=True)
         if result.returncode != 0:
