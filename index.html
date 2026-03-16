@@ -207,6 +207,44 @@
             color: var(--text-faint);
         }
 
+        .score-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 7px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        .score-badge.final {
+            color: var(--text-muted);
+            background: var(--bg-chip);
+            border: 1px solid var(--border);
+        }
+
+        .score-badge.live {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse-live 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.75); }
+        }
+
         .expand-icon {
             color: var(--text-faint);
             font-size: 13px;
@@ -349,8 +387,7 @@
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Yale -9.5 · O/U 148.5</span>
-                    <span class="tip-time">12:00 PM ET</span>
-                    <span class="expand-icon" id="icon-game-0">▸</span>
+                    <span class="score-badge final">FINAL&nbsp;88–84</span><span class="expand-icon" id="icon-game-0">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -405,8 +442,7 @@ The expected total of 150.4 is 7.9 points above the posted line of 142.5, exceed
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Arkansas +2.5 · O/U 165.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    <span class="expand-icon" id="icon-game-1">▸</span>
+                    <span class="score-badge final">FINAL&nbsp;75–86</span><span class="expand-icon" id="icon-game-1">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -454,8 +490,7 @@ Total: NO EDGE</p></div>
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">VCU -2.5 · O/U 138.5</span>
-                    <span class="tip-time">1:00 PM ET</span>
-                    <span class="expand-icon" id="icon-game-2">▸</span>
+                    <span class="score-badge final">FINAL&nbsp;62–70</span><span class="expand-icon" id="icon-game-2">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -508,8 +543,7 @@ The expected total of 149.2 points is a substantial 9.7 points higher than the p
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">South -6.5 · O/U 150.5</span>
-                    <span class="tip-time">3:15 PM ET</span>
-                    <span class="expand-icon" id="icon-game-3">▸</span>
+                    <span class="score-badge final">FINAL&nbsp;55–70</span><span class="expand-icon" id="icon-game-3">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -562,8 +596,7 @@ The pre-computed expected total of 156.6 points is 6.1 points above the posted l
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Michigan -5.5 · O/U 149.5</span>
-                    <span class="tip-time">3:30 PM ET</span>
-                    <span class="expand-icon" id="icon-game-4">▸</span>
+                    <span class="score-badge final">FINAL&nbsp;80–72</span><span class="expand-icon" id="icon-game-4">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -598,7 +631,7 @@ An edge on the spread would require a clearer divergence in ATS records, a more 
     </div>
 
     <div class="footer">
-        Updated 12:36 PM ET · betbuddy
+        Updated 9:11 PM ET · betbuddy
     </div>
 
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
