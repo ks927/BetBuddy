@@ -4,20 +4,31 @@
 # returning the full analysis text + parsed picks.
 #
 # Does NOT handle logging or user prompts — that's the caller's job.
- 
+
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from retrieval import build_context
 from prompt import build_prompt, SYSTEM_PROMPT
 from prediction_logger import parse_all_picks
- 
+
 load_dotenv()
- 
+
 MODEL = "gemini-2.5-flash"
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
- 
+
+# Retry settings for transient 503 UNAVAILABLE errors (Gemini peak demand)
+MAX_RETRIES = 4
+RETRY_DELAYS = [10, 30, 60, 120]  # seconds between attempts
+
+
+def _is_retryable(exc):
+    msg = str(exc).upper()
+    return "503" in msg or "UNAVAILABLE" in msg
+
+
  
 def run_analysis(team1_fragment, team2_fragment, stream=False, quiet=False):
     """
@@ -71,34 +82,40 @@ def run_analysis(team1_fragment, team2_fragment, stream=False, quiet=False):
         )
  
     full_response = []
- 
-    if stream:
-        response = client.models.generate_content_stream(
-            model=MODEL,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                temperature=0.3,
-                max_output_tokens=4096,
-            ),
-        )
-        for chunk in response:
-            if chunk.text:
+    config = types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        temperature=0.3,
+        max_output_tokens=4096,
+    )
+
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            if stream:
+                response = client.models.generate_content_stream(
+                    model=MODEL, contents=contents, config=config,
+                )
+                for chunk in response:
+                    if chunk.text:
+                        if not quiet:
+                            print(chunk.text, end="", flush=True)
+                        full_response.append(chunk.text)
+            else:
+                response = client.models.generate_content(
+                    model=MODEL, contents=contents, config=config,
+                )
+                if response.text:
+                    full_response.append(response.text)
+            break  # success
+
+        except Exception as exc:
+            if _is_retryable(exc) and attempt < MAX_RETRIES:
+                delay = RETRY_DELAYS[attempt]
                 if not quiet:
-                    print(chunk.text, end="", flush=True)
-                full_response.append(chunk.text)
-    else:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                temperature=0.3,
-                max_output_tokens=4096,
-            ),
-        )
-        if response.text:
-            full_response.append(response.text)
+                    print(f"\n  ⚠ Gemini 503 — retrying in {delay}s (attempt {attempt + 1}/{MAX_RETRIES})...")
+                time.sleep(delay)
+                full_response = []  # reset for clean retry
+            else:
+                raise
  
     raw_text = "".join(full_response)
     full_text = section1_text + "\n\n" + raw_text if section1_text else raw_text

@@ -752,13 +752,17 @@ def generate_html(games, conn, future_games=None):
         .odds-line {{
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: var(--text-dim);
+            color: #38bdf8;
+        }}
+
+        body.light .odds-line {{
+            color: #0284c7;
         }}
 
         .tip-time {{
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            color: var(--text-faint);
+            color: var(--text-dim);
         }}
 
         .score-badge {{

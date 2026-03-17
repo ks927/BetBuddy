@@ -8,19 +8,21 @@ An NCAAB betting analysis system that pulls live odds, team stats, ATS records, 
 
 1. **Odds** are fetched from The Odds API (DraftKings, FanDuel, BetMGM) and stored in SQLite. Every fetch is appended, building a time series of line movement.
 2. **Team stats**, game logs, and **ATS records** are pulled from ESPN for every team with an upcoming game.
-3. **Pre-computed analytics** — implied probabilities, cross-book comparisons, scoring matchups, rest days, totals gap analysis, ATS cover rates — are assembled into a context block so the LLM doesn't do any math.
-4. **Gemini 2.5 Flash** analyzes the data using a structured 6-section prompt, evaluating both the spread and the over/under.
-5. **Picks are logged** to SQLite with the full analysis text, then graded against final scores.
-6. **A static page** is generated and published to GitHub Pages showing today's full slate with expandable analysis for every game.
+3. **Efficiency ratings** — AdjOE, AdjDE, AdjEM, Tempo, and Barthag — are pulled from Barttorvik (T-Rank), providing KenPom-style schedule-adjusted metrics for free.
+4. **Pre-computed analytics** — implied probabilities, cross-book comparisons, scoring matchups, rest days, totals gap analysis, ATS cover rates, efficiency gaps — are assembled into a context block so the LLM doesn't do any math.
+5. **Gemini 2.5 Flash** analyzes the data using a structured 6-section prompt, evaluating both the spread and the over/under.
+6. **Picks are logged** to SQLite with the full analysis text, then graded against final scores.
+7. **A static page** is generated and published to GitHub Pages showing today's full slate with expandable analysis, live scores, and final results for every game.
 
 ## Quick Start
 
 ```bash
-make fetch        # pull latest odds, stats, ATS records, and injuries
+make fetch        # pull latest odds, stats, ATS records, injuries, and efficiency ratings — then publish
 make today        # see today's games
 make query Q="Duke vs Syracuse"   # analyze a single game
 make slate        # batch-analyze all of today's un-analyzed games
 make publish      # run slate + generate site + push to GitHub Pages
+make live         # refresh live/final scores and republish (no slate re-run, saves API quota)
 make score        # grade picks against final scores
 make record       # see your tracked record
 ```
@@ -30,6 +32,7 @@ make record       # see your tracked record
 - Python 3.10+
 - A [Gemini API key](https://aistudio.google.com/app/apikey) (free tier — 250 requests/day)
 - An [Odds API key](https://the-odds-api.com) (free tier — 500 requests/month)
+- Barttorvik data is free — no key required
 
 ### Python Dependencies
 
@@ -59,15 +62,7 @@ GEMINI_API_KEY=your_gemini_api_key
 make fetch
 ```
 
-### 4. Set up prediction tracking
-
-```bash
-python3 migrate_add_analysis.py
-```
-
-This adds the `analysis_text` column to the predictions table. Only needs to be run once.
-
-### 5. Enable GitHub Pages (optional)
+### 4. Enable GitHub Pages (optional)
 
 Go to your repo → Settings → Pages → Source: **gh-pages** branch → Save.
 
@@ -103,6 +98,14 @@ make publish
 
 Runs `slate` (fills in un-analyzed games), generates a static HTML page, and pushes it to the `gh-pages` branch. The page shows today's full schedule — analyzed games have expandable analysis cards, pending games appear dimmed.
 
+### Refresh live scores without re-running slate
+
+```bash
+make live
+```
+
+Fetches current scores and republishes. Use this during games to update the site without burning through API quota on a full slate re-run.
+
 ### Grade your picks
 
 ```bash
@@ -112,17 +115,25 @@ make score
 ### View your record
 
 ```bash
-make record
+make record           # summary with ROI breakdowns
+make record-detail    # full pick history
+```
+
+### Manage pending predictions
+
+```bash
+make pending    # list ungraded predictions
+make unpick     # interactively delete a pending prediction
 ```
 
 ## Daily Workflow
 
 ```bash
-# Morning: refresh data (cron runs this at 8am, 2pm, 6pm)
+# Morning: refresh data and publish (cron runs this at 8am, 2pm, 6pm)
 make fetch
 
-# Before games: publish the slate
-make publish
+# During games: update live scores without re-running analysis
+make live
 
 # After games: grade picks
 make score
@@ -142,7 +153,6 @@ BetBuddy/
 ├── prediction_logger.py    # Parses LLM picks, saves to DB with analysis text
 ├── score_predictions.py    # Grades predictions against final scores
 ├── record.py               # Displays tracked record with ROI breakdowns
-├── migrate_add_analysis.py # One-time DB migration
 ├── Makefile                # All commands
 ├── .env                    # API keys (not committed)
 ├── site/                   # Generated HTML (not committed)
@@ -150,8 +160,9 @@ BetBuddy/
 │   ├── fetch_odds.py       # Odds from The Odds API
 │   ├── fetch_stats.py      # Stats and game logs from ESPN
 │   ├── fetch_injuries.py   # Injury reports from ESPN
-│   ├── fetch_scores.py     # Final scores from The Odds API
+│   ├── fetch_scores.py     # Live and final scores from The Odds API
 │   ├── fetch_ats.py        # ATS records from ESPN
+│   ├── fetch_barttorvik.py # Efficiency ratings from Barttorvik (T-Rank)
 │   └── ncaab_team_ids.py   # Odds API team names → ESPN IDs
 └── db/
     └── sports.db           # SQLite database (auto-created)
@@ -163,8 +174,8 @@ Each game gets a 6-section analysis:
 
 1. **What the lines are saying** — spread, total, and moneyline from each book with implied probabilities. Pre-rendered from the database so numbers are never hallucinated.
 2. **Line movement** — how spreads and totals have shifted across fetches at DraftKings and FanDuel.
-3. **Spread analysis** — ATS records, season margins, recent form, home/away splits, scoring matchups, rest advantage. Oriented around favorite vs underdog, not home vs away.
-4. **Totals analysis** — expected total vs posted line, pace indicators, offensive/defensive mismatches, O/U records.
+3. **Spread analysis** — ATS records, season margins, recent form, home/away splits, scoring matchups, rest advantage, efficiency ratings (T-Rank, AdjEM). Oriented around favorite vs underdog, not home vs away.
+4. **Totals analysis** — expected total vs posted line, pace indicators (Barttorvik Tempo), offensive/defensive mismatches (AdjOE/AdjDE), O/U records.
 5. **Situational factors** — injuries, rest, home court, schedule patterns.
 6. **Conclusion** — verdict on both markets with confidence rating and a concrete recommendation.
 
@@ -175,6 +186,8 @@ Each game gets a 6-section analysis:
 - **Favorite/underdog orientation** — context is built around which team is favored, not API home/away designations. This fixes neutral-site tournament games where "home" is arbitrary.
 - **Neutral site detection** for March/April tournament games.
 - **ATS records** from ESPN's undocumented odds-records API are integrated into KEY FACTS, context blocks, and the prompt.
+- **Barttorvik efficiency data** (T-Rank) is free and provides schedule-adjusted AdjOE, AdjDE, AdjEM, Tempo, and Barthag. Efficiency reversals — where the underdog is the better team by AdjEM — are flagged prominently.
+- **Live score polling** — the published site fetches a `scores.json` file client-side so in-progress and final scores update without regenerating the full page.
 - **Date-aware score matching** prevents grading against the wrong game when teams play each other multiple times.
 - **Cross-alignment matching** in the scorer handles home/away swaps between the odds and scores API endpoints.
 
@@ -197,6 +210,19 @@ The analysis text is preserved for retrospective review — useful for identifyi
 
 An edge requires at least two independent signals pointing the same direction. ATS cover rates below 45% (as favorite) or above 55% (as underdog) count as strong signals.
 
+## Efficiency Metrics (Barttorvik T-Rank)
+
+| Metric | Meaning |
+|---|---|
+| **AdjOE** | Adjusted Offensive Efficiency — points per 100 possessions vs avg D1 opponent |
+| **AdjDE** | Adjusted Defensive Efficiency — lower is better |
+| **AdjEM** | AdjOE − AdjDE — the single best team quality number |
+| **Tempo** | Adjusted possessions per 40 min — higher = faster pace |
+| **Barthag** | Estimated probability of beating an average D1 team (0–1) |
+| **T-Rank** | National rank sorted by Barthag (#1 = best) |
+
+When AdjEM favors the underdog over the favorite, it's flagged as an **efficiency reversal** — a signal the market may be mispricing the game.
+
 ## Bookmakers Tracked
 
 | Book | Role |
@@ -215,6 +241,7 @@ When one book disagrees with the other two by 0.5+ points, it's flagged as a pot
 | "Could not find team matching..." | Check exact names with `make today`. |
 | "Ambiguous team name" | Be more specific (e.g., "arizona wildcats" not "arizona"). |
 | "Could not parse pick" | Use `make log` to enter manually. |
+| Barttorvik data missing for a team | Team name matching may have failed — check `retrieval.py:fetch_barttorvik_stats`. |
 | Unmatched predictions after `make score` | Team name mismatch — check `score_predictions.py` normalization. |
 | Missing ESPN ID | Add to `data/ncaab_team_ids.py`. Find IDs at `espn.com/mens-college-basketball/team/_/id/XXXX`. |
 | `GEMINI_API_KEY` not found | Add it to `.env`. Get a free key at [aistudio.google.com](https://aistudio.google.com/app/apikey). |
