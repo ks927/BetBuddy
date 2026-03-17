@@ -351,6 +351,34 @@
             padding: 0 16px 48px;
         }
 
+        .seed-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            min-width: 18px;
+            display: inline-block;
+        }
+
+        .ncaa-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 4px;
+            padding: 2px 6px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        body.light .ncaa-badge {
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
         .upcoming-header {
             font-size: 11px;
             font-weight: 600;
@@ -478,6 +506,7 @@
             <div class="upcoming-date-label">
                 Tuesday, March 17
                 <span class="game-count-badge">10</span>
+                <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Four</span>
             </div>
             
         <div class="upcoming-row">
@@ -493,9 +522,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>UMBC Retrievers</span>
+                <span class="seed-num">(16)</span> <span>UMBC Retrievers</span>
                 <span class="upcoming-at">@</span>
-                <span>Howard Bison</span>
+                <span class="seed-num">(16)</span> <span>Howard Bison</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Howard +1.5 · O/U 139.5</span>
@@ -548,9 +577,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>NC State Wolfpack</span>
+                <span class="seed-num">(11)</span> <span>NC State Wolfpack</span>
                 <span class="upcoming-at">@</span>
-                <span>Texas Longhorns</span>
+                <span class="seed-num">(11)</span> <span>Texas Longhorns</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Texas +1.5 · O/U 158.5</span>
@@ -595,13 +624,14 @@
             <div class="upcoming-date-label">
                 Wednesday, March 18
                 <span class="game-count-badge">10</span>
+                <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Four</span>
             </div>
             
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Prairie View Panthers</span>
+                <span class="seed-num">(16)</span> <span>Prairie View Panthers</span>
                 <span class="upcoming-at">@</span>
-                <span>Lehigh Mountain Hawks</span>
+                <span class="seed-num">(16)</span> <span>Lehigh Mountain Hawks</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Lehigh -3.5 · O/U 143.5</span>
@@ -665,9 +695,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Miami (OH) RedHawks</span>
+                <span class="seed-num">(11)</span> <span>Miami (OH) RedHawks</span>
                 <span class="upcoming-at">@</span>
-                <span>SMU Mustangs</span>
+                <span class="seed-num">(11)</span> <span>SMU Mustangs</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">SMU -6.5 · O/U 164.5</span>
@@ -712,13 +742,14 @@
             <div class="upcoming-date-label">
                 Thursday, March 19
                 <span class="game-count-badge">14</span>
+                <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>TCU Horned Frogs</span>
+                <span class="seed-num">(9)</span> <span>TCU Horned Frogs</span>
                 <span class="upcoming-at">@</span>
-                <span>Ohio State Buckeyes</span>
+                <span class="seed-num">(8)</span> <span>Ohio State Buckeyes</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Ohio -2.5 · O/U 146.5</span>
@@ -727,9 +758,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Troy Trojans</span>
+                <span class="seed-num">(13)</span> <span>Troy Trojans</span>
                 <span class="upcoming-at">@</span>
-                <span>Nebraska Cornhuskers</span>
+                <span class="seed-num">(4)</span> <span>Nebraska Cornhuskers</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Nebraska -13.5 · O/U 137.5</span>
@@ -738,9 +769,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>South Florida Bulls</span>
+                <span class="seed-num">(11)</span> <span>South Florida Bulls</span>
                 <span class="upcoming-at">@</span>
-                <span>Louisville Cardinals</span>
+                <span class="seed-num">(6)</span> <span>Louisville Cardinals</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Louisville -5.5 · O/U 165.5</span>
@@ -749,9 +780,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>High Point Panthers</span>
+                <span class="seed-num">(12)</span> <span>High Point Panthers</span>
                 <span class="upcoming-at">@</span>
-                <span>Wisconsin Badgers</span>
+                <span class="seed-num">(5)</span> <span>Wisconsin Badgers</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Wisconsin -9.5 · O/U 164.5</span>
@@ -760,9 +791,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Siena Saints</span>
+                <span class="seed-num">(16)</span> <span>Siena Saints</span>
                 <span class="upcoming-at">@</span>
-                <span>Duke Blue Devils</span>
+                <span class="seed-num">(1)</span> <span>Duke Blue Devils</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Duke -28.5 · O/U 135.5</span>
@@ -771,9 +802,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>McNeese Cowboys</span>
+                <span class="seed-num">(12)</span> <span>McNeese Cowboys</span>
                 <span class="upcoming-at">@</span>
-                <span>Vanderbilt Commodores</span>
+                <span class="seed-num">(5)</span> <span>Vanderbilt Commodores</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Vanderbilt -11.5 · O/U 150.5</span>
@@ -782,9 +813,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>North Dakota St Bison</span>
+                <span class="seed-num">(14)</span> <span>North Dakota St Bison</span>
                 <span class="upcoming-at">@</span>
-                <span>Michigan St Spartans</span>
+                <span class="seed-num">(3)</span> <span>Michigan St Spartans</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Michigan -16.5 · O/U 143.5</span>
@@ -793,9 +824,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Hawai&#x27;i Rainbow Warriors</span>
+                <span class="seed-num">(13)</span> <span>Hawai&#x27;i Rainbow Warriors</span>
                 <span class="upcoming-at">@</span>
-                <span>Arkansas Razorbacks</span>
+                <span class="seed-num">(4)</span> <span>Arkansas Razorbacks</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Arkansas -15.5 · O/U 160.5</span>
@@ -804,9 +835,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>VCU Rams</span>
+                <span class="seed-num">(11)</span> <span>VCU Rams</span>
                 <span class="upcoming-at">@</span>
-                <span>North Carolina Tar Heels</span>
+                <span class="seed-num">(6)</span> <span>North Carolina Tar Heels</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">North -2.5 · O/U 153.5</span>
@@ -815,9 +846,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Texas A&amp;M Aggies</span>
+                <span class="seed-num">(10)</span> <span>Texas A&amp;M Aggies</span>
                 <span class="upcoming-at">@</span>
-                <span>Saint Mary&#x27;s Gaels</span>
+                <span class="seed-num">(7)</span> <span>Saint Mary&#x27;s Gaels</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Saint -3.5 · O/U 147.5</span>
@@ -826,9 +857,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Pennsylvania Quakers</span>
+                <span class="seed-num">(14)</span> <span>Pennsylvania Quakers</span>
                 <span class="upcoming-at">@</span>
-                <span>Illinois Fighting Illini</span>
+                <span class="seed-num">(3)</span> <span>Illinois Fighting Illini</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Illinois -24.5 · O/U 150.5</span>
@@ -837,9 +868,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Saint Louis Billikens</span>
+                <span class="seed-num">(9)</span> <span>Saint Louis Billikens</span>
                 <span class="upcoming-at">@</span>
-                <span>Georgia Bulldogs</span>
+                <span class="seed-num">(8)</span> <span>Georgia Bulldogs</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Georgia -2.5 · O/U 169.5</span>
@@ -848,9 +879,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Kennesaw St Owls</span>
+                <span class="seed-num">(14)</span> <span>Kennesaw St Owls</span>
                 <span class="upcoming-at">@</span>
-                <span>Gonzaga Bulldogs</span>
+                <span class="seed-num">(3)</span> <span>Gonzaga Bulldogs</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Gonzaga -20.5 · O/U 154.5</span>
@@ -859,9 +890,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Idaho Vandals</span>
+                <span class="seed-num">(15)</span> <span>Idaho Vandals</span>
                 <span class="upcoming-at">@</span>
-                <span>Houston Cougars</span>
+                <span class="seed-num">(2)</span> <span>Houston Cougars</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Houston -23.5 · O/U 136.5</span>
@@ -873,13 +904,14 @@
             <div class="upcoming-date-label">
                 Friday, March 20
                 <span class="game-count-badge">14</span>
+                <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Santa Clara Broncos</span>
+                <span class="seed-num">(10)</span> <span>Santa Clara Broncos</span>
                 <span class="upcoming-at">@</span>
-                <span>Kentucky Wildcats</span>
+                <span class="seed-num">(7)</span> <span>Kentucky Wildcats</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Kentucky -3.5 · O/U 160.5</span>
@@ -888,9 +920,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Akron Zips</span>
+                <span class="seed-num">(12)</span> <span>Akron Zips</span>
                 <span class="upcoming-at">@</span>
-                <span>Texas Tech Red Raiders</span>
+                <span class="seed-num">(5)</span> <span>Texas Tech Red Raiders</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Texas -7.5 · O/U 156.5</span>
@@ -899,9 +931,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>LIU Sharks</span>
+                <span class="seed-num">(16)</span> <span>LIU Sharks</span>
                 <span class="upcoming-at">@</span>
-                <span>Arizona Wildcats</span>
+                <span class="seed-num">(1)</span> <span>Arizona Wildcats</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Arizona -31.5 · O/U 151.5</span>
@@ -910,9 +942,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Wright St Raiders</span>
+                <span class="seed-num">(14)</span> <span>Wright St Raiders</span>
                 <span class="upcoming-at">@</span>
-                <span>Virginia Cavaliers</span>
+                <span class="seed-num">(3)</span> <span>Virginia Cavaliers</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Virginia -18.5 · O/U 145.5</span>
@@ -921,9 +953,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Tennessee St Tigers</span>
+                <span class="seed-num">(15)</span> <span>Tennessee St Tigers</span>
                 <span class="upcoming-at">@</span>
-                <span>Iowa State Cyclones</span>
+                <span class="seed-num">(2)</span> <span>Iowa State Cyclones</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Iowa -24.5 · O/U 149.5</span>
@@ -932,9 +964,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Hofstra Pride</span>
+                <span class="seed-num">(13)</span> <span>Hofstra Pride</span>
                 <span class="upcoming-at">@</span>
-                <span>Alabama Crimson Tide</span>
+                <span class="seed-num">(4)</span> <span>Alabama Crimson Tide</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Alabama -12.5 · O/U 159.5</span>
@@ -943,9 +975,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Utah State Aggies</span>
+                <span class="seed-num">(9)</span> <span>Utah State Aggies</span>
                 <span class="upcoming-at">@</span>
-                <span>Villanova Wildcats</span>
+                <span class="seed-num">(8)</span> <span>Villanova Wildcats</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Villanova +2.5 · O/U 146.5</span>
@@ -954,9 +986,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Iowa Hawkeyes</span>
+                <span class="seed-num">(9)</span> <span>Iowa Hawkeyes</span>
                 <span class="upcoming-at">@</span>
-                <span>Clemson Tigers</span>
+                <span class="seed-num">(8)</span> <span>Clemson Tigers</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Clemson +2.5 · O/U 129.5</span>
@@ -965,9 +997,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Northern Iowa Panthers</span>
+                <span class="seed-num">(12)</span> <span>Northern Iowa Panthers</span>
                 <span class="upcoming-at">@</span>
-                <span>St. John&#x27;s Red Storm</span>
+                <span class="seed-num">(5)</span> <span>St. John&#x27;s Red Storm</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">St. -10.5 · O/U 132.5</span>
@@ -976,9 +1008,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>UCF Knights</span>
+                <span class="seed-num">(10)</span> <span>UCF Knights</span>
                 <span class="upcoming-at">@</span>
-                <span>UCLA Bruins</span>
+                <span class="seed-num">(7)</span> <span>UCLA Bruins</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">UCLA -5.5 · O/U 152.5</span>
@@ -987,9 +1019,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Queens University Royals</span>
+                <span class="seed-num">(15)</span> <span>Queens University Royals</span>
                 <span class="upcoming-at">@</span>
-                <span>Purdue Boilermakers</span>
+                <span class="seed-num">(2)</span> <span>Purdue Boilermakers</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Purdue -25.5 · O/U 163.5</span>
@@ -998,9 +1030,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Cal Baptist Lancers</span>
+                <span class="seed-num">(13)</span> <span>Cal Baptist Lancers</span>
                 <span class="upcoming-at">@</span>
-                <span>Kansas Jayhawks</span>
+                <span class="seed-num">(4)</span> <span>Kansas Jayhawks</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Kansas -14.5 · O/U 137.5</span>
@@ -1009,9 +1041,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Furman Paladins</span>
+                <span class="seed-num">(15)</span> <span>Furman Paladins</span>
                 <span class="upcoming-at">@</span>
-                <span>UConn Huskies</span>
+                <span class="seed-num">(2)</span> <span>UConn Huskies</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">UConn -20.5 · O/U 136.5</span>
@@ -1020,9 +1052,9 @@
         </div>
         <div class="upcoming-row">
             <div class="upcoming-matchup">
-                <span>Missouri Tigers</span>
+                <span class="seed-num">(10)</span> <span>Missouri Tigers</span>
                 <span class="upcoming-at">@</span>
-                <span>Miami Hurricanes</span>
+                <span class="seed-num">(7)</span> <span>Miami Hurricanes</span>
             </div>
             <div class="upcoming-meta">
                 <span class="upcoming-odds">Miami -1.5 · O/U 147.5</span>
@@ -1033,7 +1065,7 @@
     </div>
 
     <div class="footer">
-        Updated 9:59 PM ET · betbuddy
+        Updated 10:43 PM ET · betbuddy
     </div>
 
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
