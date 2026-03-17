@@ -345,11 +345,102 @@
             border-color: var(--border-hover);
         }
 
+        .upcoming-section {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 16px 48px;
+        }
+
+        .upcoming-header {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            padding: 8px 0 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+        }
+
+        .upcoming-date-group {
+            margin-bottom: 20px;
+        }
+
+        .upcoming-date-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upcoming-date-label .game-count-badge {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-dim);
+            background: var(--bg-chip);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1px 7px;
+        }
+
+        .upcoming-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            opacity: 0.6;
+        }
+
+        .upcoming-matchup {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-team);
+            min-width: 0;
+        }
+
+        .upcoming-at {
+            color: var(--text-faint);
+            font-size: 11px;
+        }
+
+        .upcoming-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .upcoming-odds {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .upcoming-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-faint);
+            min-width: 80px;
+            text-align: right;
+        }
+
         @media (max-width: 480px) {
             .header-inner { flex-direction: column; gap: 4px; }
             .game-header { flex-direction: column; align-items: flex-start; gap: 8px; }
             .game-meta { width: 100%; justify-content: space-between; }
             .team { font-size: 13px; }
+            .upcoming-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .upcoming-meta { width: 100%; justify-content: space-between; }
         }
     </style>
 </head>
@@ -379,8 +470,570 @@
         <div style="text-align:center;padding:48px;color:var(--text-dim)">No games scheduled today.</div>
     </div>
 
+    
+    <div class="upcoming-section">
+        <div class="upcoming-header">Upcoming</div>
+        
+        <div class="upcoming-date-group">
+            <div class="upcoming-date-label">
+                Tuesday, March 17
+                <span class="game-count-badge">10</span>
+            </div>
+            
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Liberty Flames</span>
+                <span class="upcoming-at">@</span>
+                <span>George Mason Patriots</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">George -5.5 · O/U 143.5</span>
+                <span class="upcoming-time">6:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>UMBC Retrievers</span>
+                <span class="upcoming-at">@</span>
+                <span>Howard Bison</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Howard +1.5 · O/U 139.5</span>
+                <span class="upcoming-time">6:40 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>UNC Wilmington Seahawks</span>
+                <span class="upcoming-at">@</span>
+                <span>Yale Bulldogs</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Yale -4.5 · O/U 145.5</span>
+                <span class="upcoming-time">7:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Wyoming Cowboys</span>
+                <span class="upcoming-at">@</span>
+                <span>Wichita St Shockers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Wichita -5.5 · O/U 147.5</span>
+                <span class="upcoming-time">7:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Davidson Wildcats</span>
+                <span class="upcoming-at">@</span>
+                <span>Oklahoma St Cowboys</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Oklahoma -8.5 · O/U 154.5</span>
+                <span class="upcoming-time">8:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Stephen F. Austin Lumberjacks</span>
+                <span class="upcoming-at">@</span>
+                <span>Tulsa Golden Hurricane</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Tulsa -7.5 · O/U 153.5</span>
+                <span class="upcoming-time">9:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>NC State Wolfpack</span>
+                <span class="upcoming-at">@</span>
+                <span>Texas Longhorns</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Texas +1.5 · O/U 158.5</span>
+                <span class="upcoming-time">9:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>South Alabama Jaguars</span>
+                <span class="upcoming-at">@</span>
+                <span>Auburn Tigers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Auburn -17.5 · O/U 152.5</span>
+                <span class="upcoming-time">10:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>St. Thomas (MN) Tommies</span>
+                <span class="upcoming-at">@</span>
+                <span>Seattle Redhawks</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Seattle -1.5 · O/U 145.5</span>
+                <span class="upcoming-time">10:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>UNLV Rebels</span>
+                <span class="upcoming-at">@</span>
+                <span>UC Irvine Anteaters</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">UC -2.5 · O/U 152.5</span>
+                <span class="upcoming-time">11:00 PM ET</span>
+            </div>
+        </div>
+        </div>
+        <div class="upcoming-date-group">
+            <div class="upcoming-date-label">
+                Wednesday, March 18
+                <span class="game-count-badge">10</span>
+            </div>
+            
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Prairie View Panthers</span>
+                <span class="upcoming-at">@</span>
+                <span>Lehigh Mountain Hawks</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Lehigh -3.5 · O/U 143.5</span>
+                <span class="upcoming-time">6:40 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Navy Midshipmen</span>
+                <span class="upcoming-at">@</span>
+                <span>Wake Forest Demon Deacons</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Wake -11.5 · O/U 147.5</span>
+                <span class="upcoming-time">7:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>GW Revolutionaries</span>
+                <span class="upcoming-at">@</span>
+                <span>Utah Valley Wolverines</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Utah -1.5 · O/U 156.5</span>
+                <span class="upcoming-time">8:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Kent State Golden Flashes</span>
+                <span class="upcoming-at">@</span>
+                <span>Illinois St Redbirds</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Illinois -6.5 · O/U 152.5</span>
+                <span class="upcoming-time">8:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Dayton Flyers</span>
+                <span class="upcoming-at">@</span>
+                <span>Bradley Braves</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Bradley +1.5 · O/U 142.5</span>
+                <span class="upcoming-time">9:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Sam Houston St Bearkats</span>
+                <span class="upcoming-at">@</span>
+                <span>New Mexico Lobos</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">New -11.5 · O/U 163.5</span>
+                <span class="upcoming-time">9:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Miami (OH) RedHawks</span>
+                <span class="upcoming-at">@</span>
+                <span>SMU Mustangs</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">SMU -6.5 · O/U 164.5</span>
+                <span class="upcoming-time">9:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Murray St Racers</span>
+                <span class="upcoming-at">@</span>
+                <span>Nevada Wolf Pack</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Nevada -8.5 · O/U 161.5</span>
+                <span class="upcoming-time">10:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>UIC Flames</span>
+                <span class="upcoming-at">@</span>
+                <span>California Golden Bears</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">California -5.5 · O/U 148.5</span>
+                <span class="upcoming-time">11:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Saint Joseph&#x27;s Hawks</span>
+                <span class="upcoming-at">@</span>
+                <span>Colorado St Rams</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Colorado -5.5 · O/U 143.5</span>
+                <span class="upcoming-time">11:00 PM ET</span>
+            </div>
+        </div>
+        </div>
+        <div class="upcoming-date-group">
+            <div class="upcoming-date-label">
+                Thursday, March 19
+                <span class="game-count-badge">14</span>
+            </div>
+            
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>TCU Horned Frogs</span>
+                <span class="upcoming-at">@</span>
+                <span>Ohio State Buckeyes</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Ohio -2.5 · O/U 146.5</span>
+                <span class="upcoming-time">12:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Troy Trojans</span>
+                <span class="upcoming-at">@</span>
+                <span>Nebraska Cornhuskers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Nebraska -13.5 · O/U 137.5</span>
+                <span class="upcoming-time">12:40 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>South Florida Bulls</span>
+                <span class="upcoming-at">@</span>
+                <span>Louisville Cardinals</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Louisville -5.5 · O/U 165.5</span>
+                <span class="upcoming-time">1:30 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>High Point Panthers</span>
+                <span class="upcoming-at">@</span>
+                <span>Wisconsin Badgers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Wisconsin -9.5 · O/U 164.5</span>
+                <span class="upcoming-time">1:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Siena Saints</span>
+                <span class="upcoming-at">@</span>
+                <span>Duke Blue Devils</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Duke -28.5 · O/U 135.5</span>
+                <span class="upcoming-time">2:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>McNeese Cowboys</span>
+                <span class="upcoming-at">@</span>
+                <span>Vanderbilt Commodores</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Vanderbilt -11.5 · O/U 150.5</span>
+                <span class="upcoming-time">3:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>North Dakota St Bison</span>
+                <span class="upcoming-at">@</span>
+                <span>Michigan St Spartans</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Michigan -16.5 · O/U 143.5</span>
+                <span class="upcoming-time">4:05 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Hawai&#x27;i Rainbow Warriors</span>
+                <span class="upcoming-at">@</span>
+                <span>Arkansas Razorbacks</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Arkansas -15.5 · O/U 160.5</span>
+                <span class="upcoming-time">4:25 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>VCU Rams</span>
+                <span class="upcoming-at">@</span>
+                <span>North Carolina Tar Heels</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">North -2.5 · O/U 153.5</span>
+                <span class="upcoming-time">6:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Texas A&amp;M Aggies</span>
+                <span class="upcoming-at">@</span>
+                <span>Saint Mary&#x27;s Gaels</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Saint -3.5 · O/U 147.5</span>
+                <span class="upcoming-time">7:35 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Pennsylvania Quakers</span>
+                <span class="upcoming-at">@</span>
+                <span>Illinois Fighting Illini</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Illinois -24.5 · O/U 150.5</span>
+                <span class="upcoming-time">9:25 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Saint Louis Billikens</span>
+                <span class="upcoming-at">@</span>
+                <span>Georgia Bulldogs</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Georgia -2.5 · O/U 169.5</span>
+                <span class="upcoming-time">9:45 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Kennesaw St Owls</span>
+                <span class="upcoming-at">@</span>
+                <span>Gonzaga Bulldogs</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Gonzaga -20.5 · O/U 154.5</span>
+                <span class="upcoming-time">10:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Idaho Vandals</span>
+                <span class="upcoming-at">@</span>
+                <span>Houston Cougars</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Houston -23.5 · O/U 136.5</span>
+                <span class="upcoming-time">10:10 PM ET</span>
+            </div>
+        </div>
+        </div>
+        <div class="upcoming-date-group">
+            <div class="upcoming-date-label">
+                Friday, March 20
+                <span class="game-count-badge">14</span>
+            </div>
+            
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Santa Clara Broncos</span>
+                <span class="upcoming-at">@</span>
+                <span>Kentucky Wildcats</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Kentucky -3.5 · O/U 160.5</span>
+                <span class="upcoming-time">12:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Akron Zips</span>
+                <span class="upcoming-at">@</span>
+                <span>Texas Tech Red Raiders</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Texas -7.5 · O/U 156.5</span>
+                <span class="upcoming-time">12:40 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>LIU Sharks</span>
+                <span class="upcoming-at">@</span>
+                <span>Arizona Wildcats</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Arizona -31.5 · O/U 151.5</span>
+                <span class="upcoming-time">1:35 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Wright St Raiders</span>
+                <span class="upcoming-at">@</span>
+                <span>Virginia Cavaliers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Virginia -18.5 · O/U 145.5</span>
+                <span class="upcoming-time">1:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Tennessee St Tigers</span>
+                <span class="upcoming-at">@</span>
+                <span>Iowa State Cyclones</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Iowa -24.5 · O/U 149.5</span>
+                <span class="upcoming-time">2:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Hofstra Pride</span>
+                <span class="upcoming-at">@</span>
+                <span>Alabama Crimson Tide</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Alabama -12.5 · O/U 159.5</span>
+                <span class="upcoming-time">3:15 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Utah State Aggies</span>
+                <span class="upcoming-at">@</span>
+                <span>Villanova Wildcats</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Villanova +2.5 · O/U 146.5</span>
+                <span class="upcoming-time">4:10 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Iowa Hawkeyes</span>
+                <span class="upcoming-at">@</span>
+                <span>Clemson Tigers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Clemson +2.5 · O/U 129.5</span>
+                <span class="upcoming-time">6:50 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Northern Iowa Panthers</span>
+                <span class="upcoming-at">@</span>
+                <span>St. John&#x27;s Red Storm</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">St. -10.5 · O/U 132.5</span>
+                <span class="upcoming-time">7:10 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>UCF Knights</span>
+                <span class="upcoming-at">@</span>
+                <span>UCLA Bruins</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">UCLA -5.5 · O/U 152.5</span>
+                <span class="upcoming-time">7:25 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Queens University Royals</span>
+                <span class="upcoming-at">@</span>
+                <span>Purdue Boilermakers</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Purdue -25.5 · O/U 163.5</span>
+                <span class="upcoming-time">7:35 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Cal Baptist Lancers</span>
+                <span class="upcoming-at">@</span>
+                <span>Kansas Jayhawks</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Kansas -14.5 · O/U 137.5</span>
+                <span class="upcoming-time">9:45 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Furman Paladins</span>
+                <span class="upcoming-at">@</span>
+                <span>UConn Huskies</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">UConn -20.5 · O/U 136.5</span>
+                <span class="upcoming-time">10:00 PM ET</span>
+            </div>
+        </div>
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                <span>Missouri Tigers</span>
+                <span class="upcoming-at">@</span>
+                <span>Miami Hurricanes</span>
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">Miami -1.5 · O/U 147.5</span>
+                <span class="upcoming-time">10:10 PM ET</span>
+            </div>
+        </div>
+        </div>
+    </div>
+
     <div class="footer">
-        Updated 11:17 AM ET · betbuddy
+        Updated 9:59 PM ET · betbuddy
     </div>
 
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
