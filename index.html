@@ -101,9 +101,20 @@
             align-items: center;
         }
 
+        .subheader-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
         .game-count {
             font-size: 13px;
             color: var(--text-muted);
+        }
+
+        .last-analysis {
+            font-size: 11px;
+            color: var(--text-dim);
         }
 
         .legend {
@@ -485,7 +496,10 @@
     </div>
 
     <div class="subheader">
-        <span class="game-count">10 games · 10 analyzed</span>
+        <div class="subheader-left">
+            <span class="game-count">10 games · 10 analyzed</span>
+            <span class="last-analysis">Last analysis: 3/17/2026 01:57:41 PM</span>
+        </div>
         <div class="legend">
             <div class="legend-item">
                 <span class="status-dot analyzed"></span>
@@ -510,7 +524,7 @@
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">George -4.5 · O/U 144.5</span>
+                    <span class="odds-line">George -3.5 · O/U 141.5</span>
                     <span class="tip-time">6:00 PM ET</span><span class="expand-icon" id="icon-game-0">&#9658;</span>
                 </div>
             </div>
@@ -555,7 +569,7 @@ Total: NO EDGE</p></div>
                     <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Four</span>
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Howard +1.5 · O/U 140.5</span>
+                    <span class="odds-line">Howard +1.5 · O/U 142.5</span>
                     <span class="tip-time">6:40 PM ET</span><span class="expand-icon" id="icon-game-1">&#9658;</span>
                 </div>
             </div>
@@ -647,7 +661,7 @@ Spread: NO EDGE</p></div>
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Wichita -6.5 · O/U 148.5</span>
+                    <span class="odds-line">Wichita -5.5 · O/U 147.5</span>
                     <span class="tip-time">7:00 PM ET</span><span class="expand-icon" id="icon-game-3">&#9658;</span>
                 </div>
             </div>
@@ -691,7 +705,7 @@ Spread: NO EDGE</p></div>
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Oklahoma -8.5 · O/U 155.5</span>
+                    <span class="odds-line">Oklahoma -6.5 · O/U 153.5</span>
                     <span class="tip-time">8:00 PM ET</span><span class="expand-icon" id="icon-game-4">&#9658;</span>
                 </div>
             </div>
@@ -736,7 +750,7 @@ Total: NO EDGE</p></div>
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Tulsa -7.5 · O/U 154.5</span>
+                    <span class="odds-line">Tulsa -6.5 · O/U 150.5</span>
                     <span class="tip-time">9:00 PM ET</span><span class="expand-icon" id="icon-game-5">&#9658;</span>
                 </div>
             </div>
@@ -744,6 +758,10 @@ Total: NO EDGE</p></div>
                     <div class="pick-chip">
                         <span class="pick-label">Stephen F. Austin +7.5</span>
                         <span class="pick-conf" style="color:#ef4444">HIGH</span>
+                    </div>
+                    <div class="pick-chip">
+                        <span class="pick-label">Stephen F. Austin +7.5</span>
+                        <span class="pick-conf" style="color:#f59e0b">MEDIUM</span>
                     </div></div>
             
                 <div class="analysis-panel" id="game-5">
@@ -780,7 +798,7 @@ Total: NO EDGE</p></div>
                     <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Four</span>
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Texas -1.5 · O/U 157.5</span>
+                    <span class="odds-line">Texas +1.5 · O/U 157.5</span>
                     <span class="tip-time">9:15 PM ET</span><span class="expand-icon" id="icon-game-6">&#9658;</span>
                 </div>
             </div>
@@ -876,7 +894,7 @@ Total: NO EDGE</p></div>
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">Seattle -2.5 · O/U 146.5</span>
+                    <span class="odds-line">Seattle -1.5 · O/U 145.5</span>
                     <span class="tip-time">10:00 PM ET</span><span class="expand-icon" id="icon-game-8">&#9658;</span>
                 </div>
             </div>
@@ -912,7 +930,7 @@ Neither team has reported any injuries, so player availability is not a factor. 
                     
                 </div>
                 <div class="game-meta">
-                    <span class="odds-line">UC -3.5 · O/U 152.5</span>
+                    <span class="odds-line">UC -1.5 · O/U 151.5</span>
                     <span class="tip-time">11:00 PM ET</span><span class="expand-icon" id="icon-game-9">&#9658;</span>
                 </div>
             </div>
@@ -1110,7 +1128,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">Nebraska -13.5 · O/U 137.5</span>
+                <span class="upcoming-odds">Nebraska -12.5 · O/U 137.5</span>
                 <span class="upcoming-time">12:40 PM ET</span>
             </div>
         </div>
@@ -1206,7 +1224,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">Saint -2.5 · O/U 146.5</span>
+                <span class="upcoming-odds">Saint -2.5 · O/U 147.5</span>
                 <span class="upcoming-time">7:35 PM ET</span>
             </div>
         </div>
@@ -1285,7 +1303,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">Texas -7.5 · O/U 156.5</span>
+                <span class="upcoming-odds">Texas -8.5 · O/U 156.5</span>
                 <span class="upcoming-time">12:40 PM ET</span>
             </div>
         </div>
@@ -1297,7 +1315,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">Arizona -31.5 · O/U 151.5</span>
+                <span class="upcoming-odds">Arizona -31.5 · O/U 150.5</span>
                 <span class="upcoming-time">1:35 PM ET</span>
             </div>
         </div>
@@ -1357,7 +1375,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">Clemson +2.5 · O/U 129.5</span>
+                <span class="upcoming-odds">Clemson +2.5 · O/U 128.5</span>
                 <span class="upcoming-time">6:50 PM ET</span>
             </div>
         </div>
@@ -1369,7 +1387,7 @@ Total: NO EDGE</p></div>
                 <span class="ncaa-badge">NCAA&nbsp;·&nbsp;First Round</span>
             </div>
             <div class="upcoming-meta">
-                <span class="upcoming-odds">St. -10.5 · O/U 132.5</span>
+                <span class="upcoming-odds">St. -10.5 · O/U 131.5</span>
                 <span class="upcoming-time">7:10 PM ET</span>
             </div>
         </div>
@@ -1437,7 +1455,7 @@ Total: NO EDGE</p></div>
     </div>
 
     <div class="footer">
-        Updated 11:42 AM ET · betbuddy
+        Updated 3:50 PM ET · betbuddy
     </div>
 
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
