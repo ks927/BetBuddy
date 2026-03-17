@@ -246,6 +246,12 @@
             border: 1px solid rgba(34, 197, 94, 0.25);
         }
 
+        .live-ago {
+            font-weight: 400;
+            opacity: 0.6;
+            font-size: 10px;
+        }
+
         .live-dot {
             width: 6px;
             height: 6px;
@@ -525,7 +531,7 @@
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">George -2.5 · O/U 141.5</span>
-                    <span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;65–65</span><span class="expand-icon" id="icon-game-0">&#9658;</span>
+                    <span class="score-badge live" data-last-update="2026-03-17T23:54:50Z"><span class="live-dot"></span>LIVE&nbsp;67–65</span><span class="expand-icon" id="icon-game-0">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -570,7 +576,7 @@ Total: NO EDGE</p></div>
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Howard -1.5 · O/U 143.5</span>
-                    <span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;41–49</span><span class="expand-icon" id="icon-game-1">&#9658;</span>
+                    <span class="score-badge live" data-last-update="2026-03-17T23:54:50Z"><span class="live-dot"></span>LIVE&nbsp;41–49</span><span class="expand-icon" id="icon-game-1">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -613,7 +619,7 @@ Total: NO EDGE</p></div>
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Yale -4.5 · O/U 147.5</span>
-                    <span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;26–32</span><span class="expand-icon" id="icon-game-2">&#9658;</span>
+                    <span class="score-badge live" data-last-update="2026-03-17T23:54:50Z"><span class="live-dot"></span>LIVE&nbsp;26–32</span><span class="expand-icon" id="icon-game-2">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -662,7 +668,7 @@ Spread: NO EDGE</p></div>
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">Wichita -5.5 · O/U 148.5</span>
-                    <span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;22–26</span><span class="expand-icon" id="icon-game-3">&#9658;</span>
+                    <span class="score-badge live" data-last-update="2026-03-17T23:54:50Z"><span class="live-dot"></span>LIVE&nbsp;24–28</span><span class="expand-icon" id="icon-game-3">&#9658;</span>
                 </div>
             </div>
             <div class="picks-row">
@@ -1455,7 +1461,7 @@ Total: NO EDGE</p></div>
     </div>
 
     <div class="footer">
-        Updated 7:45 PM ET · betbuddy
+        Updated 7:55 PM ET · betbuddy
     </div>
 
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
@@ -1491,6 +1497,19 @@ Total: NO EDGE</p></div>
         })();
 
         // Live score polling — fetches scores.json every 60s and updates cards
+        function timeAgo(isoStr) {
+            if (!isoStr) return '';
+            const diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+            if (diff < 60) return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            return Math.floor(diff / 3600) + 'h ago';
+        }
+
+        function liveBadgeHtml(scoreStr, lastUpdate) {
+            const ago = lastUpdate ? '&nbsp;<span class="live-ago">' + timeAgo(lastUpdate) + '</span>' : '';
+            return '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr + ago;
+        }
+
         async function pollScores() {
             try {
                 const resp = await fetch('scores.json?t=' + Date.now());
@@ -1512,7 +1531,7 @@ Total: NO EDGE</p></div>
                             badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
                         } else {
                             badge.className = 'score-badge live';
-                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                            badge.innerHTML = liveBadgeHtml(scoreStr, score.last_update);
                         }
                     } else {
                         // Insert badge, replacing tip time
@@ -1524,7 +1543,7 @@ Total: NO EDGE</p></div>
                             badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
                         } else {
                             badge.className = 'score-badge live';
-                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                            badge.innerHTML = liveBadgeHtml(scoreStr, score.last_update);
                         }
                         tipEl.replaceWith(badge);
                     }
