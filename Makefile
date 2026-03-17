@@ -8,7 +8,11 @@ endif
 
 # Fetch fresh odds, stats, and injuries before a session
 fetch:
-	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py && python3 -m data.fetch_ats && make publish
+	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py && python3 -m data.fetch_ats && python3 $(DATA_DIR)/fetch_barttorvik.py && make publish
+
+# Fetch Barttorvik efficiency ratings (KenPom-style AdjOE/AdjDE/AdjEM/Tempo)
+kenpom:
+	python3 $(DATA_DIR)/fetch_barttorvik.py
 
 # Fetch odds only
 odds:
@@ -93,4 +97,4 @@ reset:
 	rm -f db/sports.db
 	@echo "Database cleared."
 
-.PHONY: fetch odds stats injuries today games query reset live
+.PHONY: fetch odds stats injuries today games query reset live kenpom

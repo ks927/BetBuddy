@@ -18,6 +18,121 @@ import subprocess
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
 
+# ── 2026 NCAA TOURNAMENT FIELD ────────────────────────────────────────────────
+# Keyed by exact Odds API team name. A game is tagged as NCAA tournament only
+# if BOTH teams appear in this dict — this prevents NIT/CBI games (whose teams
+# are not in this set) from being mis-tagged.
+#
+# First Four teams share a seed with the eventual bracket slot winner.
+# Rounds are mapped by date in NCAA_ROUNDS_2026 below.
+
+NCAA_TOURNAMENT_2026 = {
+    # ── EAST (1: Duke) ─────────────────────────────────────────────────────────
+    "Duke Blue Devils":          {"seed": 1,  "region": "East"},
+    "UConn Huskies":             {"seed": 2,  "region": "East"},
+    "Michigan St Spartans":      {"seed": 3,  "region": "East"},
+    "Kansas Jayhawks":           {"seed": 4,  "region": "East"},
+    "St. John's Red Storm":      {"seed": 5,  "region": "East"},
+    "Louisville Cardinals":      {"seed": 6,  "region": "East"},
+    "UCLA Bruins":               {"seed": 7,  "region": "East"},
+    "Ohio State Buckeyes":       {"seed": 8,  "region": "East"},
+    "TCU Horned Frogs":          {"seed": 9,  "region": "East"},
+    "UCF Knights":               {"seed": 10, "region": "East"},
+    "South Florida Bulls":       {"seed": 11, "region": "East"},
+    "Northern Iowa Panthers":    {"seed": 12, "region": "East"},
+    "Cal Baptist Lancers":       {"seed": 13, "region": "East"},
+    "North Dakota St Bison":     {"seed": 14, "region": "East"},
+    "Furman Paladins":           {"seed": 15, "region": "East"},
+    "Siena Saints":              {"seed": 16, "region": "East"},
+    # ── WEST (1: Arizona) ──────────────────────────────────────────────────────
+    "Arizona Wildcats":          {"seed": 1,  "region": "West"},
+    "Purdue Boilermakers":       {"seed": 2,  "region": "West"},
+    "Gonzaga Bulldogs":          {"seed": 3,  "region": "West"},
+    "Arkansas Razorbacks":       {"seed": 4,  "region": "West"},
+    "Wisconsin Badgers":         {"seed": 5,  "region": "West"},
+    "BYU Cougars":               {"seed": 6,  "region": "West"},
+    "Miami Hurricanes":          {"seed": 7,  "region": "West"},
+    "Villanova Wildcats":        {"seed": 8,  "region": "West"},
+    "Utah State Aggies":         {"seed": 9,  "region": "West"},
+    "Missouri Tigers":           {"seed": 10, "region": "West"},
+    "Texas Longhorns":           {"seed": 11, "region": "West"},  # First Four
+    "NC State Wolfpack":         {"seed": 11, "region": "West"},  # First Four
+    "High Point Panthers":       {"seed": 12, "region": "West"},
+    "Hawai'i Rainbow Warriors":  {"seed": 13, "region": "West"},
+    "Kennesaw St Owls":          {"seed": 14, "region": "West"},
+    "Queens University Royals":  {"seed": 15, "region": "West"},
+    "LIU Sharks":                {"seed": 16, "region": "West"},
+    # ── MIDWEST (1: Michigan) ──────────────────────────────────────────────────
+    "Michigan Wolverines":       {"seed": 1,  "region": "Midwest"},
+    "Iowa State Cyclones":       {"seed": 2,  "region": "Midwest"},
+    "Virginia Cavaliers":        {"seed": 3,  "region": "Midwest"},
+    "Alabama Crimson Tide":      {"seed": 4,  "region": "Midwest"},
+    "Texas Tech Red Raiders":    {"seed": 5,  "region": "Midwest"},
+    "Tennessee Volunteers":      {"seed": 6,  "region": "Midwest"},
+    "Kentucky Wildcats":         {"seed": 7,  "region": "Midwest"},
+    "Georgia Bulldogs":          {"seed": 8,  "region": "Midwest"},
+    "Saint Louis Billikens":     {"seed": 9,  "region": "Midwest"},
+    "Santa Clara Broncos":       {"seed": 10, "region": "Midwest"},
+    "SMU Mustangs":              {"seed": 11, "region": "Midwest"},  # First Four
+    "Miami (OH) RedHawks":       {"seed": 11, "region": "Midwest"},  # First Four
+    "Akron Zips":                {"seed": 12, "region": "Midwest"},
+    "Hofstra Pride":             {"seed": 13, "region": "Midwest"},
+    "Wright St Raiders":         {"seed": 14, "region": "Midwest"},
+    "Tennessee St Tigers":       {"seed": 15, "region": "Midwest"},
+    "UMBC Retrievers":           {"seed": 16, "region": "Midwest"},  # First Four
+    "Howard Bison":              {"seed": 16, "region": "Midwest"},  # First Four
+    # ── SOUTH (1: Florida) ─────────────────────────────────────────────────────
+    "Florida Gators":            {"seed": 1,  "region": "South"},
+    "Houston Cougars":           {"seed": 2,  "region": "South"},
+    "Illinois Fighting Illini":  {"seed": 3,  "region": "South"},
+    "Nebraska Cornhuskers":      {"seed": 4,  "region": "South"},
+    "Vanderbilt Commodores":     {"seed": 5,  "region": "South"},
+    "North Carolina Tar Heels":  {"seed": 6,  "region": "South"},
+    "Saint Mary's Gaels":        {"seed": 7,  "region": "South"},
+    "Clemson Tigers":            {"seed": 8,  "region": "South"},
+    "Iowa Hawkeyes":             {"seed": 9,  "region": "South"},
+    "Texas A&M Aggies":          {"seed": 10, "region": "South"},
+    "VCU Rams":                  {"seed": 11, "region": "South"},
+    "McNeese Cowboys":           {"seed": 12, "region": "South"},
+    "Troy Trojans":              {"seed": 13, "region": "South"},
+    "Pennsylvania Quakers":      {"seed": 14, "region": "South"},
+    "Idaho Vandals":             {"seed": 15, "region": "South"},
+    "Prairie View Panthers":     {"seed": 16, "region": "South"},  # First Four
+    "Lehigh Mountain Hawks":     {"seed": 16, "region": "South"},  # First Four
+}
+
+# Round labels by date range (inclusive)
+NCAA_ROUNDS_2026 = [
+    ("2026-03-17", "2026-03-18", "First Four"),
+    ("2026-03-19", "2026-03-20", "First Round"),
+    ("2026-03-21", "2026-03-22", "Second Round"),
+    ("2026-03-27", "2026-03-28", "Sweet 16"),
+    ("2026-03-29", "2026-03-30", "Elite 8"),
+    ("2026-04-04", "2026-04-04", "Final Four"),
+    ("2026-04-06", "2026-04-06", "Championship"),
+]
+
+
+def get_tournament_info(team_name):
+    """Return {"seed": int, "region": str} if team is in the 2026 NCAA field, else None."""
+    if team_name in NCAA_TOURNAMENT_2026:
+        return NCAA_TOURNAMENT_2026[team_name]
+    # Fuzzy fallback using the same normalize function
+    tn = normalize_team(team_name)
+    for t, info in NCAA_TOURNAMENT_2026.items():
+        if normalize_team(t) == tn:
+            return info
+    return None
+
+
+def get_tournament_round(game_date_str):
+    """Return the round name for a game date (YYYY-MM-DD), or None."""
+    for start, end, round_name in NCAA_ROUNDS_2026:
+        if start <= game_date_str <= end:
+            return round_name
+    return None
+
+
 DB_PATH = os.path.join(os.path.dirname(__file__), "db", "sports.db")
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "site")
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "index.html")
@@ -44,6 +159,52 @@ def teams_match(name_a, name_b):
     if a_w and b_w and a_w[-1] == b_w[-1] and len(a_w[-1]) > 3:
         return True
     return False
+
+
+def get_future_schedule(conn):
+    """
+    Get all games beyond today, grouped by date.
+    Returns a list of (date_str, display_label, [games]) tuples, sorted by date.
+    """
+    today_et = datetime.now(ET).date()
+
+    cursor = conn.execute("""
+        SELECT DISTINCT game_id, home_team, away_team, commence_time
+        FROM odds
+        WHERE sport = 'basketball_ncaab'
+        AND replace(replace(commence_time, 'T', ' '), 'Z', '') > datetime('now')
+        ORDER BY commence_time ASC
+    """)
+
+    by_date = {}
+    seen = set()
+    for game_id, home, away, commence in cursor.fetchall():
+        try:
+            tip_utc = datetime.fromisoformat(commence.replace("Z", "+00:00"))
+            tip_et = tip_utc.astimezone(ET)
+            tip_date = tip_et.date()
+            if tip_date <= today_et:
+                continue
+            key = (home, away, tip_date.isoformat())
+            if key in seen:
+                continue
+            seen.add(key)
+            if tip_date not in by_date:
+                by_date[tip_date] = []
+            by_date[tip_date].append({
+                "game_id": game_id,
+                "home_team": home,
+                "away_team": away,
+                "tip_display": tip_et.strftime("%-I:%M %p ET"),
+            })
+        except Exception:
+            continue
+
+    result = []
+    for d in sorted(by_date.keys()):
+        label = d.strftime("%A, %B %-d")
+        result.append((d.isoformat(), label, by_date[d]))
+    return result
 
 
 def get_todays_schedule(conn):
@@ -209,10 +370,72 @@ def sanitize_analysis(text):
     return "\n".join(formatted)
 
 
-def generate_html(games, conn):
+def generate_upcoming_html(future_games, conn):
+    """Render the upcoming games section — schedule only, no analysis."""
+    if not future_games:
+        return ""
+
+    groups_html = ""
+    for date_iso, date_label, games in future_games:
+        rows_html = ""
+        for game in games:
+            home = game["home_team"]
+            away = game["away_team"]
+            tip = game["tip_display"]
+
+            spread = get_latest_spread(conn, game["game_id"], home)
+            total = get_latest_total(conn, game["game_id"])
+
+            odds_parts = []
+            if spread is not None:
+                odds_parts.append(f"{home.split()[0]} {spread:+.1f}")
+            if total is not None:
+                odds_parts.append(f"O/U {total}")
+            odds_str = html.escape(" · ".join(odds_parts)) if odds_parts else ""
+
+            away_info = get_tournament_info(away)
+            home_info = get_tournament_info(home)
+            is_ncaa = bool(away_info and home_info)
+            u_away_seed = f'<span class="seed-num">({away_info["seed"]})</span> ' if away_info and is_ncaa else ""
+            u_home_seed = f'<span class="seed-num">({home_info["seed"]})</span> ' if home_info and is_ncaa else ""
+            ncaa_round = get_tournament_round(date_iso) if is_ncaa else None
+            u_ncaa_badge = f'<span class="ncaa-badge">NCAA&nbsp;·&nbsp;{ncaa_round}</span>' if ncaa_round else ""
+
+            rows_html += f"""
+        <div class="upcoming-row">
+            <div class="upcoming-matchup">
+                {u_away_seed}<span>{html.escape(away)}</span>
+                <span class="upcoming-at">@</span>
+                {u_home_seed}<span>{html.escape(home)}</span>
+                {u_ncaa_badge}
+            </div>
+            <div class="upcoming-meta">
+                <span class="upcoming-odds">{odds_str}</span>
+                <span class="upcoming-time">{tip}</span>
+            </div>
+        </div>"""
+
+        groups_html += f"""
+        <div class="upcoming-date-group">
+            <div class="upcoming-date-label">
+                {date_label}
+                <span class="game-count-badge">{len(games)}</span>
+            </div>
+            {rows_html}
+        </div>"""
+
+    return f"""
+    <div class="upcoming-section">
+        <div class="upcoming-header">Upcoming</div>
+        {groups_html}
+    </div>"""
+
+
+def generate_html(games, conn, future_games=None):
     """Generate the full HTML page."""
     today_str = date.today().strftime("%A, %B %-d, %Y")
     today_iso = date.today().isoformat()
+    upcoming_html = generate_upcoming_html(future_games or [], conn)
 
     cards_html = ""
     analyzed_count = 0
@@ -233,6 +456,15 @@ def generate_html(games, conn):
         if total is not None:
             odds_parts.append(f"O/U {total}")
         odds_str = html.escape(" · ".join(odds_parts)) if odds_parts else ""
+
+        # Tournament detection — requires BOTH teams to be in the field
+        away_info = get_tournament_info(away)
+        home_info = get_tournament_info(home)
+        is_ncaa = bool(away_info and home_info)
+        game_date_str = datetime.fromisoformat(
+            game["commence_time"].replace("Z", "+00:00")
+        ).astimezone(ET).date().isoformat() if is_ncaa else today_iso
+        ncaa_round = get_tournament_round(game_date_str) if is_ncaa else None
 
         # Get predictions
         picks, analysis_text = get_predictions_for_game(conn, home, away, today_iso)
@@ -297,14 +529,19 @@ def generate_html(games, conn):
         else:
             meta_right = f'<span class="tip-time">{tip}</span>' + expand_icon
 
+        away_seed_html = f'<span class="seed-num">({away_info["seed"]})</span> ' if away_info and is_ncaa else ""
+        home_seed_html = f'<span class="seed-num">({home_info["seed"]})</span> ' if home_info and is_ncaa else ""
+        ncaa_badge_html = f'<span class="ncaa-badge">NCAA&nbsp;·&nbsp;{ncaa_round}</span>' if is_ncaa and ncaa_round else ""
+
         cards_html += f"""
         <div class="{card_class}" {onclick} data-game-id="{game['game_id']}">
             <div class="game-header">
                 <div class="matchup">
                     {status}
-                    <span class="team away">{html.escape(away)}</span>
+                    {away_seed_html}<span class="team away">{html.escape(away)}</span>
                     <span class="at">@</span>
-                    <span class="team home">{html.escape(home)}</span>
+                    {home_seed_html}<span class="team home">{html.escape(home)}</span>
+                    {ncaa_badge_html}
                 </div>
                 <div class="game-meta">
                     <span class="odds-line">{odds_str}</span>
@@ -662,11 +899,130 @@ def generate_html(games, conn):
             border-color: var(--border-hover);
         }}
 
+        .upcoming-section {{
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 16px 48px;
+        }}
+
+        .seed-num {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            min-width: 18px;
+            display: inline-block;
+        }}
+
+        .ncaa-badge {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 4px;
+            padding: 2px 6px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }}
+
+        body.light .ncaa-badge {{
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.2);
+        }}
+
+        .upcoming-header {{
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            padding: 8px 0 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+        }}
+
+        .upcoming-date-group {{
+            margin-bottom: 20px;
+        }}
+
+        .upcoming-date-label {{
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+
+        .upcoming-date-label .game-count-badge {{
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-dim);
+            background: var(--bg-chip);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1px 7px;
+        }}
+
+        .upcoming-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            opacity: 0.6;
+        }}
+
+        .upcoming-matchup {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-team);
+            min-width: 0;
+        }}
+
+        .upcoming-at {{
+            color: var(--text-faint);
+            font-size: 11px;
+        }}
+
+        .upcoming-meta {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }}
+
+        .upcoming-odds {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }}
+
+        .upcoming-time {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-faint);
+            min-width: 80px;
+            text-align: right;
+        }}
+
         @media (max-width: 480px) {{
             .header-inner {{ flex-direction: column; gap: 4px; }}
             .game-header {{ flex-direction: column; align-items: flex-start; gap: 8px; }}
             .game-meta {{ width: 100%; justify-content: space-between; }}
             .team {{ font-size: 13px; }}
+            .upcoming-row {{ flex-direction: column; align-items: flex-start; gap: 6px; }}
+            .upcoming-meta {{ width: 100%; justify-content: space-between; }}
         }}
     </style>
 </head>
@@ -695,6 +1051,8 @@ def generate_html(games, conn):
     <div class="container">
         {cards_html if cards_html else '<div style="text-align:center;padding:48px;color:var(--text-dim)">No games scheduled today.</div>'}
     </div>
+
+    {upcoming_html}
 
     <div class="footer">
         Updated {datetime.now(ET).strftime("%-I:%M %p ET")} · betbuddy
@@ -812,7 +1170,8 @@ def generate_scores_json(games, conn):
 def publish():
     conn = sqlite3.connect(DB_PATH)
     games = get_todays_schedule(conn)
-    html_content = generate_html(games, conn)
+    future_games = get_future_schedule(conn)
+    html_content = generate_html(games, conn, future_games)
     generate_scores_json(games, conn)
     conn.close()
 

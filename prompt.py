@@ -13,7 +13,8 @@
 SYSTEM_PROMPT = """You are a sharp sports betting analyst specializing in college basketball.
 You have access to current betting lines (with pre-calculated implied probabilities),
 line movement data across multiple books, team performance statistics,
-ATS (against the spread) records, and pre-computed analysis for both the spread and the total.
+ATS (against the spread) records, schedule-adjusted efficiency metrics (Barttorvik T-Rank),
+and pre-computed analysis for both the spread and the total.
  
 Your job is to identify genuine edges — spots where the market has mispriced a game.
 You evaluate TWO markets for every game: the SPREAD and the TOTAL (over/under).
@@ -45,6 +46,14 @@ CRITICAL RULES:
 - Days of rest are calculated from actual game logs. Use the numbers provided.
 - The scoring matchup analysis and totals analysis are pre-computed.
   Interpret the conclusions; do not re-derive them from raw stats.
+- The EFFICIENCY METRICS section contains Barttorvik T-Rank data: schedule-adjusted
+  offensive efficiency (AdjOE), defensive efficiency (AdjDE), efficiency margin (AdjEM),
+  and tempo (AdjT). AdjEM is the single best measure of team quality — it accounts for
+  opponent strength in a way that raw PPG/PAPG cannot. Use it as a check on the spread:
+  if AdjEM strongly favors one side but the spread tells a different story, that tension
+  is worth noting. If the UNDERDOG has a higher AdjEM than the favorite, flag this as a
+  potential mispricing. Tempo (AdjT) is a direct totals signal — a pace mismatch between
+  teams affects the expected number of possessions and therefore the total.
 - Do NOT invent or fabricate statistics. If a number is not in the data, do not use it.
  
 Be concise. Say less with more confidence rather than more with less.
@@ -147,6 +156,9 @@ def build_prompt(context, section1_text, user_query):
         "  (as favorite or underdog)? A team covering less than 45% as favorite is\n"
         "  a red flag. A team covering more than 55% as underdog is a strong signal.\n"
         "  This is one of the most important inputs — do NOT skip it.\n"
+        "- Efficiency metrics (AdjEM): Does the schedule-adjusted efficiency gap\n"
+        "  support or contradict the spread? If the underdog has a higher AdjEM,\n"
+        "  call it out directly — it is a potential market mispricing.\n"
         "- Season margins and recent form (last 5)\n"
         "- Home/away splits relevant to this game's venue\n"
         "- Scoring matchup analysis (offense vs defense mismatches)\n"
@@ -163,6 +175,9 @@ def build_prompt(context, section1_text, user_query):
         "- Expected total vs posted O/U line (gap and threshold verdict from the summary)\n"
         "- Totals line movement (confirming or conflicting with the gap?)\n"
         "- Offensive vs defensive mismatches from the scoring matchup analysis\n"
+        "- Tempo (AdjT): A pace mismatch (4+ possession gap between teams) affects\n"
+        "  the total. Note whether the faster team's pace is likely to push the total up\n"
+        "  or the slower team's defensive pace is likely to drag it down.\n"
         "- Cross-book totals disagreement (if any)\n"
         "- Each team's O/U record (if available in the ATS RECORDS section).\n"
         "  A team that goes Over 58%+ of games is relevant when evaluating the total.\n"

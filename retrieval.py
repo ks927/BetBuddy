@@ -707,7 +707,8 @@ def totals_direction_summary(lines, fav_stats, dog_stats, fav_team, dog_team, to
 # ── KEY FACTS BLOCK ───────────────────────────────────────────────────────────
 
 def build_key_facts(fav_team, dog_team, lines, fav_stats, dog_stats,
-                    fav_rest, dog_rest, expected_total, posted_total, is_neutral, fav_ats=None, dog_ats=None):
+                    fav_rest, dog_rest, expected_total, posted_total, is_neutral,
+                    fav_ats=None, dog_ats=None, fav_bt=None, dog_bt=None):
     fav_short = fav_team.split()[0]
     dog_short = dog_team.split()[0]
     facts = []
@@ -778,6 +779,19 @@ def build_key_facts(fav_team, dog_team, lines, fav_stats, dog_stats,
             facts.append(f"• {dog_short} is {dw}-{dl} ATS this season ({pct}% cover rate).")
             if pct >= 55:
                 facts.append(f"• *** {dog_short} is a GOOD cover team. The market undervalues them. ***")
+
+    # Efficiency metrics (Barttorvik)
+    if fav_bt and dog_bt and fav_bt['adj_em'] is not None and dog_bt['adj_em'] is not None:
+        em_gap = round(fav_bt['adj_em'] - dog_bt['adj_em'], 2)
+        if em_gap < 0:
+            facts.append(f"• *** EFFICIENCY ALERT: {dog_short} (T-Rank #{dog_bt['rank']}, "
+                         f"AdjEM {dog_bt['adj_em']:+.2f}) has a BETTER efficiency rating than "
+                         f"{fav_short} (#{fav_bt['rank']}, AdjEM {fav_bt['adj_em']:+.2f}). "
+                         f"The underdog is the better team by this metric. ***")
+        else:
+            facts.append(f"• Efficiency edge: {fav_short} #{fav_bt['rank']} (AdjEM {fav_bt['adj_em']:+.2f}) "
+                         f"vs {dog_short} #{dog_bt['rank']} (AdjEM {dog_bt['adj_em']:+.2f}) "
+                         f"— gap of {em_gap:+.2f}.")
 
     return "\n".join(facts)
 
@@ -1110,6 +1124,124 @@ def format_ats_block(team_name, ats, role, is_home, is_neutral):
 
     return "\n".join(lines)
 
+# ── FETCH BARTTORVIK (EFFICIENCY) STATS ───────────────────────────────────────
+
+def fetch_barttorvik_stats(conn, odds_team_name):
+    """
+    Match an Odds API team name to a Barttorvik row.
+    Barttorvik uses short names ('Duke', 'Michigan St.') while the Odds API
+    uses full names ('Duke Blue Devils', 'Michigan St Spartans').
+
+    Strategy 1: find all barttorvik names where the odds name starts with the
+    barttorvik name (after stripping periods). Take the longest match to
+    correctly distinguish 'Michigan' from 'Michigan St.'.
+
+    Strategy 2 (fallback): barttorvik name is a substring of the odds name.
+    """
+    try:
+        rows = conn.execute(
+            "SELECT team_name, rank, adj_oe, adj_de, adj_em, adj_t, barthag FROM barttorvik_stats"
+        ).fetchall()
+    except Exception:
+        return None
+
+    if not rows:
+        return None
+
+    def normalize(name):
+        return name.lower().replace('.', '').strip()
+
+    odds_lower = normalize(odds_team_name)
+
+    # Strategy 1: odds name starts with barttorvik name — take longest match
+    prefix_matches = []
+    for row in rows:
+        bt_norm = normalize(row[0])
+        if odds_lower == bt_norm or odds_lower.startswith(bt_norm + ' '):
+            prefix_matches.append((len(bt_norm), row))
+
+    if prefix_matches:
+        best = max(prefix_matches, key=lambda x: x[0])[1]
+        return {"team_name": best[0], "rank": best[1], "adj_oe": best[2],
+                "adj_de": best[3], "adj_em": best[4], "adj_t": best[5], "barthag": best[6]}
+
+    # Strategy 2: barttorvik name contained in odds name
+    for row in rows:
+        bt_norm = normalize(row[0])
+        if len(bt_norm) >= 4 and bt_norm in odds_lower:
+            return {"team_name": row[0], "rank": row[1], "adj_oe": row[2],
+                    "adj_de": row[3], "adj_em": row[4], "adj_t": row[5], "barthag": row[6]}
+
+    return None
+
+
+# ── FORMAT EFFICIENCY BLOCK ───────────────────────────────────────────────────
+
+def format_efficiency_block(fav_team, dog_team, fav_bt, dog_bt):
+    """
+    Format Barttorvik efficiency metrics for the LLM context.
+    AdjOE/AdjDE are schedule-adjusted points per 100 possessions.
+    AdjEM = AdjOE - AdjDE (higher = better team overall).
+    Tempo = adjusted possessions per 40 min (higher = faster pace).
+    """
+    fav_short = fav_team.split()[0]
+    dog_short = dog_team.split()[0]
+    lines = []
+
+    def team_line(short, bt):
+        if not bt:
+            return f"  {short}: not found in Barttorvik data"
+        em  = f"{bt['adj_em']:+.2f}" if bt['adj_em']  is not None else "N/A"
+        oe  = f"{bt['adj_oe']:.1f}"  if bt['adj_oe']  is not None else "N/A"
+        de  = f"{bt['adj_de']:.1f}"  if bt['adj_de']  is not None else "N/A"
+        t   = f"{bt['adj_t']:.1f}"   if bt['adj_t']   is not None else "N/A"
+        bar = f"{bt['barthag']:.3f}" if bt['barthag'] is not None else "N/A"
+        return (f"  {short}: T-Rank #{bt['rank']}  AdjEM {em}  "
+                f"(AdjO {oe} | AdjD {de})  Tempo {t}  Barthag {bar}")
+
+    lines.append(team_line(fav_short, fav_bt))
+    lines.append(team_line(dog_short, dog_bt))
+
+    if fav_bt and dog_bt and fav_bt['adj_em'] is not None and dog_bt['adj_em'] is not None:
+        em_gap = round(fav_bt['adj_em'] - dog_bt['adj_em'], 2)
+        rank_gap = dog_bt['rank'] - fav_bt['rank']
+        lines.append("")
+        lines.append(f"  AdjEM gap: {fav_short} leads by {em_gap:+.2f} efficiency points "
+                     f"(#{fav_bt['rank']} vs #{dog_bt['rank']}, a {abs(rank_gap)}-rank gap)")
+
+        if em_gap < 0:
+            lines.append(f"  *** EFFICIENCY REVERSAL: {dog_short} has the BETTER efficiency "
+                         f"rating despite being the underdog. The market may be mispricing this game. ***")
+        elif em_gap > 20:
+            lines.append(f"  Dominant efficiency edge for {fav_short}. The spread may understate their true advantage.")
+        elif em_gap > 10:
+            lines.append(f"  Meaningful efficiency edge for {fav_short}.")
+        elif em_gap < 5:
+            lines.append(f"  Small efficiency gap — closer game than the spread might suggest.")
+
+        # Tempo mismatch — signal for totals
+        if fav_bt['adj_t'] is not None and dog_bt['adj_t'] is not None:
+            tempo_gap = abs(fav_bt['adj_t'] - dog_bt['adj_t'])
+            faster = fav_short if fav_bt['adj_t'] > dog_bt['adj_t'] else dog_short
+            slower = dog_short if fav_bt['adj_t'] > dog_bt['adj_t'] else fav_short
+            lines.append("")
+            if tempo_gap >= 4:
+                lines.append(f"  *** PACE MISMATCH: {faster} ({max(fav_bt['adj_t'], dog_bt['adj_t']):.1f}) "
+                             f"plays significantly faster than {slower} ({min(fav_bt['adj_t'], dog_bt['adj_t']):.1f}). "
+                             f"Pace conflict is a totals signal — game will likely play at a compromise tempo. ***")
+            elif tempo_gap >= 2:
+                lines.append(f"  Moderate pace difference: {faster} is faster ({max(fav_bt['adj_t'], dog_bt['adj_t']):.1f} "
+                             f"vs {min(fav_bt['adj_t'], dog_bt['adj_t']):.1f}). Mild totals consideration.")
+            else:
+                avg_t = (fav_bt['adj_t'] + dog_bt['adj_t']) / 2
+                lines.append(f"  Similar pace ({fav_short} {fav_bt['adj_t']:.1f} vs {dog_short} {dog_bt['adj_t']:.1f} — avg ~{avg_t:.1f}). No pace mismatch.")
+
+    elif not fav_bt and not dog_bt:
+        return "  Barttorvik data not available for either team."
+
+    return "\n".join(lines)
+
+
 # ── MAIN ENTRY POINT ──────────────────────────────────────────────────────────
 
 def build_context(team1_query, team2_query):
@@ -1184,6 +1316,9 @@ def build_context(team1_query, team2_query):
     fav_ats = fetch_ats_records(conn, fav_team)
     dog_ats = fetch_ats_records(conn, dog_team)
 
+    fav_bt = fetch_barttorvik_stats(conn, fav_team)
+    dog_bt = fetch_barttorvik_stats(conn, dog_team)
+
     conn.close()
 
     fav_is_home = (fav_team == api_home)
@@ -1209,6 +1344,9 @@ def build_context(team1_query, team2_query):
     fav_injuries_str = format_injuries(fav_injuries, fav_team)
     dog_injuries_str = format_injuries(dog_injuries, dog_team)
 
+    # Efficiency block (Barttorvik)
+    efficiency_block = format_efficiency_block(fav_team, dog_team, fav_bt, dog_bt)
+
     # Pre-compute directional summaries
     spread_summary = spread_direction_summary(lines, fav_stats, dog_stats,
                                                fav_team, dog_team,
@@ -1233,7 +1371,8 @@ def build_context(team1_query, team2_query):
 
     key_facts = build_key_facts(fav_team, dog_team, lines, fav_stats,
                                  dog_stats, fav_rest, dog_rest,
-                                 expected_total, posted_total, is_neutral, fav_ats, dog_ats)
+                                 expected_total, posted_total, is_neutral,
+                                 fav_ats, dog_ats, fav_bt, dog_bt)
 
     # ── v4: Context labels ──
     # For neutral site games: label as FAVORITE / UNDERDOG
@@ -1324,6 +1463,15 @@ SCORING MATCHUP ANALYSIS (pre-computed)
 TOTALS ANALYSIS (pre-computed — expected total vs posted O/U)
 ══════════════════════════════════════════════════════════════════════
 {totals_edge}
+
+══════════════════════════════════════════════════════════════════════
+EFFICIENCY METRICS — Barttorvik T-Rank (schedule-adjusted)
+AdjOE/AdjDE = pts per 100 possessions vs avg D1 opponent
+AdjEM = AdjOE − AdjDE (higher = better team)
+Tempo = adjusted possessions per 40 min (higher = faster)
+Barthag = estimated win probability vs avg D1 team (0–1)
+══════════════════════════════════════════════════════════════════════
+{efficiency_block}
 
 ══════════════════════════════════════════════════════════════════════
 INJURIES — {fav_team.upper()} ({fav_label})
