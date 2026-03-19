@@ -317,14 +317,14 @@ def get_predictions_for_game(conn, home_team, away_team, game_date):
 
 
 def get_game_score(conn, game_id):
-    """Return (away_score, home_score, completed) for a game, or None if not available."""
+    """Return (away_score, home_score, completed, last_update) for a game, or None if not available."""
     try:
         row = conn.execute(
-            "SELECT away_score, home_score, completed FROM scores WHERE id = ?",
+            "SELECT away_score, home_score, completed, last_update FROM scores WHERE id = ?",
             (game_id,),
         ).fetchone()
         if row:
-            return row  # (away_score, home_score, completed)
+            return row  # (away_score, home_score, completed, last_update)
     except sqlite3.OperationalError:
         # completed column missing — fall back to old schema
         try:
@@ -333,7 +333,7 @@ def get_game_score(conn, game_id):
                 (game_id,),
             ).fetchone()
             if row:
-                return (row[0], row[1], 1)
+                return (row[0], row[1], 1, None)
         except sqlite3.OperationalError:
             pass
     return None
@@ -363,10 +363,16 @@ def sanitize_analysis(text):
     formatted = []
     for p in paragraphs:
         p = p.strip()
-        if p:
-            if not p.startswith("<h4"):
-                p = f"<p style='margin:0 0 12px;line-height:1.6'>{p}</p>"
+        if not p:
+            continue
+        if p.startswith("<h4"):
             formatted.append(p)
+        elif re.match(r'^RECOMMENDATION\b', p):
+            # Wrap entire paragraph (pick line + rationale) in callout
+            inner = p.replace("\n", "<br>")
+            formatted.append(f'<div class="rec-callout">{inner}</div>')
+        else:
+            formatted.append(f"<p style='margin:0 0 12px;line-height:1.6'>{p}</p>")
     return "\n".join(formatted)
 
 
@@ -431,12 +437,25 @@ def generate_upcoming_html(future_games, conn):
     </div>"""
 
 
+def get_last_analysis_time(conn, game_date):
+    """Return a formatted timestamp of the most recent prediction for game_date, or None."""
+    row = conn.execute(
+        "SELECT MAX(predicted_at) FROM predictions WHERE game_date = ?",
+        (game_date,),
+    ).fetchone()
+    if not row or not row[0]:
+        return None
+    dt = datetime.fromisoformat(row[0]).astimezone(ET)
+    return dt.strftime("%-m/%-d/%Y %I:%M:%S %p")
+
+
 def generate_html(games, conn, future_games=None):
     """Generate the full HTML page."""
     today_str = date.today().strftime("%A, %B %-d, %Y")
     today_iso = date.today().isoformat()
     upcoming_html = generate_upcoming_html(future_games or [], conn)
 
+    last_analysis = get_last_analysis_time(conn, today_iso)
     cards_html = ""
     analyzed_count = 0
 
@@ -476,12 +495,13 @@ def generate_html(games, conn, future_games=None):
         score_data = get_game_score(conn, game["game_id"])
         score_html = ""
         if score_data:
-            away_score, home_score, completed = score_data
+            away_score, home_score, completed, last_update = score_data
             score_str = f"{away_score}–{home_score}"
             if completed:
                 score_html = f'<span class="score-badge final">FINAL&nbsp;{score_str}</span>'
             else:
-                score_html = f'<span class="score-badge live"><span class="live-dot"></span>LIVE&nbsp;{score_str}</span>'
+                lu_attr = f' data-last-update="{last_update}"' if last_update else ''
+                score_html = f'<span class="score-badge live"{lu_attr}><span class="live-dot"></span>LIVE&nbsp;{score_str}</span>'
 
         # Build picks chips
         picks_html = ""
@@ -655,9 +675,20 @@ def generate_html(games, conn, future_games=None):
             align-items: center;
         }}
 
+        .subheader-left {{
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }}
+
         .game-count {{
             font-size: 13px;
             color: var(--text-muted);
+        }}
+
+        .last-analysis {{
+            font-size: 11px;
+            color: var(--text-dim);
         }}
 
         .legend {{
@@ -789,6 +820,12 @@ def generate_html(games, conn, future_games=None):
             border: 1px solid rgba(34, 197, 94, 0.25);
         }}
 
+        .live-ago {{
+            font-weight: 400;
+            opacity: 0.6;
+            font-size: 10px;
+        }}
+
         .live-dot {{
             width: 6px;
             height: 6px;
@@ -870,6 +907,26 @@ def generate_html(games, conn, future_games=None):
 
         .analysis-content strong {{
             color: var(--text-analysis-strong);
+        }}
+
+        .rec-callout {{
+            margin: 16px 0 4px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-left: 3px solid #3b82f6;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            letter-spacing: 0.01em;
+        }}
+
+        body.light .rec-callout {{
+            background: rgba(37, 99, 235, 0.06);
+            border-color: rgba(37, 99, 235, 0.25);
+            border-left-color: #2563eb;
+            color: #18181b;
         }}
 
         .footer {{
@@ -1039,7 +1096,10 @@ def generate_html(games, conn, future_games=None):
     </div>
 
     <div class="subheader">
-        <span class="game-count">{len(games)} games · {analyzed_count} analyzed</span>
+        <div class="subheader-left">
+            <span class="game-count">{len(games)} games · {analyzed_count} analyzed</span>
+            {f'<span class="last-analysis">Last analysis: {last_analysis}</span>' if last_analysis else ''}
+        </div>
         <div class="legend">
             <div class="legend-item">
                 <span class="status-dot analyzed"></span>
@@ -1095,6 +1155,19 @@ def generate_html(games, conn, future_games=None):
         }})();
 
         // Live score polling — fetches scores.json every 60s and updates cards
+        function timeAgo(isoStr) {{
+            if (!isoStr) return '';
+            const diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+            if (diff < 60) return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            return Math.floor(diff / 3600) + 'h ago';
+        }}
+
+        function liveBadgeHtml(scoreStr, lastUpdate) {{
+            const ago = lastUpdate ? '&nbsp;<span class="live-ago">' + timeAgo(lastUpdate) + '</span>' : '';
+            return '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr + ago;
+        }}
+
         async function pollScores() {{
             try {{
                 const resp = await fetch('scores.json?t=' + Date.now());
@@ -1116,7 +1189,7 @@ def generate_html(games, conn, future_games=None):
                             badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
                         }} else {{
                             badge.className = 'score-badge live';
-                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                            badge.innerHTML = liveBadgeHtml(scoreStr, score.last_update);
                         }}
                     }} else {{
                         // Insert badge, replacing tip time
@@ -1128,7 +1201,7 @@ def generate_html(games, conn, future_games=None):
                             badge.innerHTML = 'FINAL&nbsp;' + scoreStr;
                         }} else {{
                             badge.className = 'score-badge live';
-                            badge.innerHTML = '<span class="live-dot"></span>LIVE&nbsp;' + scoreStr;
+                            badge.innerHTML = liveBadgeHtml(scoreStr, score.last_update);
                         }}
                         tipEl.replaceWith(badge);
                     }}
@@ -1151,11 +1224,12 @@ def generate_scores_json(games, conn):
     for game in games:
         score_data = get_game_score(conn, game["game_id"])
         if score_data:
-            away_score, home_score, completed = score_data
+            away_score, home_score, completed, last_update = score_data
             scores[game["game_id"]] = {
                 "away": away_score,
                 "home": home_score,
                 "completed": bool(completed),
+                "last_update": last_update or "",
             }
 
     output = {

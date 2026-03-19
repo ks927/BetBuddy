@@ -1,4 +1,5 @@
 DATA_DIR = data
+PYTHON = /opt/homebrew/bin/python3.10
 
 # Load .env file if it exists
 ifneq (,$(wildcard ./.env))
@@ -8,47 +9,47 @@ endif
 
 # Fetch fresh odds, stats, and injuries before a session
 fetch:
-	python3 $(DATA_DIR)/fetch_odds.py && python3 $(DATA_DIR)/fetch_stats.py && python3 $(DATA_DIR)/fetch_injuries.py && python3 -m data.fetch_ats && python3 $(DATA_DIR)/fetch_barttorvik.py && make publish
+	$(PYTHON) $(DATA_DIR)/fetch_odds.py && $(PYTHON) $(DATA_DIR)/fetch_stats.py && $(PYTHON) $(DATA_DIR)/fetch_injuries.py && $(PYTHON) -m data.fetch_ats && $(PYTHON) $(DATA_DIR)/fetch_barttorvik.py && make publish
 
 # Fetch Barttorvik efficiency ratings (KenPom-style AdjOE/AdjDE/AdjEM/Tempo)
 kenpom:
-	python3 $(DATA_DIR)/fetch_barttorvik.py
+	$(PYTHON) $(DATA_DIR)/fetch_barttorvik.py
 
 # Fetch odds only
 odds:
-	python3 $(DATA_DIR)/fetch_odds.py
+	$(PYTHON) $(DATA_DIR)/fetch_odds.py
 
 # Fetch stats only (requires odds to have run first)
 stats:
-	python3 $(DATA_DIR)/fetch_stats.py
+	$(PYTHON) $(DATA_DIR)/fetch_stats.py
 
 # Fetch injuries only (requires odds to have run first)
 injuries:
-	python3 $(DATA_DIR)/fetch_injuries.py
+	$(PYTHON) $(DATA_DIR)/fetch_injuries.py
 
 # List today's games
 today:
-	python3 list_games.py today
+	$(PYTHON) list_games.py today
 
 # List all upcoming games
 games:
-	python3 list_games.py
+	$(PYTHON) list_games.py
 
 # Query the system — usage: make query Q="Duke vs Syracuse"
 query:
-	python3 query.py "$(Q)"
+	$(PYTHON) query.py "$(Q)"
 
 # Grade predictions against actual results
 score:
-	python3 -m data.fetch_scores && python3 score_predictions.py
+	$(PYTHON) -m data.fetch_scores && $(PYTHON) score_predictions.py
 
 # View your record
 record:
-	python3 record.py
+	$(PYTHON) record.py
 
 # View full record with all picks
 record-detail:
-	python3 record.py --detail
+	$(PYTHON) record.py --detail
 
 # View ungraded (pending) predictions
 pending:
@@ -73,24 +74,24 @@ unpick:
 	fi
 
 ats:
-	python3 -m data.fetch_ats
+	$(PYTHON) -m data.fetch_ats
 
 slate:
-	python3 slate.py
+	$(PYTHON) slate.py
 
 # Manual pick entry (if auto-parse fails)
 log:
-	python3 prediction_logger.py
+	$(PYTHON) prediction_logger.py
 
 publish:
-	python3 slate.py && python3 publish.py --push
+	$(PYTHON) slate.py && $(PYTHON) publish.py --push
 
 # Refresh live/final scores and republish (no slate re-run, saves API quota)
 live:
-	python3 -m data.fetch_scores && python3 publish.py --push
+	$(PYTHON) -m data.fetch_scores && $(PYTHON) publish.py --push
 
 publish-preview:
-	python3 publish.py
+	$(PYTHON) publish.py
 
 # Wipe the database and start fresh
 reset:

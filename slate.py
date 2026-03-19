@@ -6,27 +6,30 @@
 # Usage:
 #   python3 slate.py                # analyze today's un-analyzed games
 #   make slate                      # same thing
- 
+
 import sqlite3
 import re
 import os
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
- 
+
 from analysis import run_analysis
 from prediction_logger import save_prediction
- 
+
 DB_PATH = os.path.join(os.path.dirname(__file__), "db", "sports.db")
 ET = ZoneInfo("America/New_York")
- 
+
 # ── ANSI COLORS ───────────────────────────────────────────────────────────────
 GREEN = "\033[1;32m"
 RED = "\033[1;31m"
 CYAN = "\033[1;36m"
 DIM = "\033[2m"
 RESET = "\033[0m"
- 
- 
+
+# Re-analyze a game if its last analysis is older than this many hours
+REANALYSIS_HOURS = 2
+
+
 def normalize_team(name):
     """Simplify team name for matching."""
     return (
@@ -38,8 +41,8 @@ def normalize_team(name):
         .replace(".", "")
         .replace("-", " ")
     )
- 
- 
+
+
 def teams_match(name_a, name_b):
     a = normalize_team(name_a)
     b = normalize_team(name_b)
@@ -52,12 +55,12 @@ def teams_match(name_a, name_b):
     if a_words and b_words and a_words[-1] == b_words[-1] and len(a_words[-1]) > 3:
         return True
     return False
- 
- 
+
+
 def get_todays_games(conn):
     """Get all unique games scheduled for today from the odds table."""
     today_et = datetime.now(ET).date()
- 
+
     cursor = conn.execute("""
         SELECT DISTINCT game_id, home_team, away_team, commence_time
         FROM odds
@@ -65,7 +68,7 @@ def get_todays_games(conn):
         AND replace(replace(commence_time, 'T', ' '), 'Z', '') > datetime('now', '-12 hours')
         ORDER BY commence_time ASC
     """)
- 
+
     games = []
     for game_id, home, away, commence in cursor.fetchall():
         try:
@@ -80,34 +83,41 @@ def get_todays_games(conn):
                 })
         except Exception:
             continue
- 
+
     return games
- 
- 
+
+
 def game_already_analyzed(conn, home_team, away_team, game_date):
-    """Check if we already have an analysis for this game in predictions."""
+    """Return True if this game was analyzed within the last REANALYSIS_HOURS hours."""
     rows = conn.execute(
         """
-        SELECT id FROM predictions
+        SELECT id, predicted_at FROM predictions
         WHERE game_date = ? AND analysis_text IS NOT NULL
         """,
         (game_date,),
     ).fetchall()
- 
-    # Check if any existing prediction matches these teams
-    for row in rows:
+
+    cutoff = datetime.now(ET) - timedelta(hours=REANALYSIS_HOURS)
+
+    for row_id, predicted_at in rows:
         pred = conn.execute(
             "SELECT home_team, away_team FROM predictions WHERE id = ?",
-            (row[0],),
+            (row_id,),
         ).fetchone()
-        if pred:
-            if teams_match(pred[0], home_team) and teams_match(pred[1], away_team):
-                return True
-            if teams_match(pred[0], away_team) and teams_match(pred[1], home_team):
+        if not pred:
+            continue
+        home_match = teams_match(pred[0], home_team) and teams_match(pred[1], away_team)
+        away_match = teams_match(pred[0], away_team) and teams_match(pred[1], home_team)
+        if home_match or away_match:
+            try:
+                analyzed_at = datetime.fromisoformat(predicted_at).astimezone(ET)
+            except Exception:
+                return True  # can't parse timestamp, assume fresh
+            if analyzed_at >= cutoff:
                 return True
     return False
- 
- 
+
+
 def extract_team_query(full_name):
     """
     Convert an Odds API team name into a query fragment.
@@ -115,39 +125,52 @@ def extract_team_query(full_name):
     'BYU Cougars' → 'byu cougars'
     """
     return full_name.lower().strip()
- 
- 
+
+
 def run_slate():
     conn = sqlite3.connect(DB_PATH)
     today = date.today().isoformat()
- 
+
     games = get_todays_games(conn)
     if not games:
         print("No games scheduled for today.")
         conn.close()
         return
- 
+
     print(f"\n{CYAN}── BetBuddy Slate: {date.today().strftime('%A %B %-d')} ──{RESET}")
     print(f"   {len(games)} games on the schedule\n")
- 
+
     analyzed = 0
     skipped = 0
     errors = 0
- 
+
     for i, game in enumerate(games, 1):
         home = game["home_team"]
         away = game["away_team"]
-        short_home = home.split()[0] if home else "?"
-        short_away = away.split()[0] if away else "?"
- 
-        # Check if already analyzed
+
+        # Skip if analyzed recently
         if game_already_analyzed(conn, home, away, today):
-            print(f"  {DIM}[{i}/{len(games)}] {away} @ {home} — already analyzed, skipping{RESET}")
+            print(f"  {DIM}[{i}/{len(games)}] {away} @ {home} — analyzed within {REANALYSIS_HOURS}h, skipping{RESET}")
             skipped += 1
             continue
- 
+
         print(f"  {CYAN}[{i}/{len(games)}]{RESET} Analyzing {away} @ {home}...")
- 
+
+        # Delete stale predictions before saving fresh ones
+        existing = conn.execute(
+            "SELECT id FROM predictions WHERE game_date = ? AND analysis_text IS NOT NULL",
+            (today,),
+        ).fetchall()
+        for (row_id,) in existing:
+            pred = conn.execute(
+                "SELECT home_team, away_team FROM predictions WHERE id = ?", (row_id,)
+            ).fetchone()
+            if pred:
+                if (teams_match(pred[0], home) and teams_match(pred[1], away)) or \
+                   (teams_match(pred[0], away) and teams_match(pred[1], home)):
+                    conn.execute("DELETE FROM predictions WHERE id = ?", (row_id,))
+        conn.commit()
+
         try:
             result = run_analysis(
                 extract_team_query(away),
@@ -155,15 +178,15 @@ def run_slate():
                 stream=False,
                 quiet=True,
             )
- 
+
             if result["error"]:
                 print(f"    {RED}✗ {result['error']}{RESET}")
                 errors += 1
                 continue
- 
+
             picks = result["picks"]
             analysis_text = result["analysis_text"]
- 
+
             if not picks:
                 # Check for PASS
                 if re.search(r'NO\s+EDGE\s*[—–-]\s*PASS', analysis_text.upper()):
@@ -182,7 +205,7 @@ def run_slate():
                     )
                     errors += 1
                     continue
- 
+
             # Save each pick
             for p in picks:
                 save_prediction(
@@ -194,22 +217,22 @@ def run_slate():
                     confidence=p["confidence"],
                     analysis_text=analysis_text,
                 )
- 
+
             pick_summary = " | ".join(
                 f"{p['pick']} ({p['confidence']})" for p in picks
             )
             print(f"    {GREEN}✓ {pick_summary}{RESET}")
             analyzed += 1
- 
+
         except Exception as e:
             print(f"    {RED}✗ Error: {e}{RESET}")
             errors += 1
- 
+
     conn.close()
- 
+
     print(f"\n  Analyzed: {analyzed} | Skipped: {skipped} | Errors: {errors}")
     print(f"  Total: {len(games)} games\n")
- 
- 
+
+
 if __name__ == "__main__":
     run_slate()
